@@ -1,6 +1,9 @@
 import puppeteer from "puppeteer";
 import { jobSuchKonfiguration } from "./config/config";
+import dotenv from 'dotenv';
 import type { Job, JobSuchKonfiguration} from "./types/types";
+
+dotenv.config();
 
 async function scrapeJobs(arbeitsBezeichnungen: JobSuchKonfiguration): Promise<Job[]> {
     const browser = await puppeteer.launch({ headless: true });

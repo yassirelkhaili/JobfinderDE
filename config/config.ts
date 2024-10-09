@@ -61,6 +61,6 @@ export const jobSuchKonfiguration: JobSuchKonfiguration = {
 	 * Siehe die Seite der Bundesagentur für Arbeit für mögliche Branchen.
 	 */
 	 branche: [
-			'IT-Computer-Telekommunikation'
+	'IT-Computer-Telekommunikation'
 	]
 };
