@@ -23,37 +23,28 @@ async function scrapeJobs(config: JobSuchKonfiguration): Promise<void> {
   const ort = config['ort'];
 
   // Führt die Evaluierungsfunktion auf der Seite aus
-  const jobs = await page.evaluate(async (arbeitsBezeichnungen, ort) => {
-    /**
-     * Sucht nach dem `bahf-cookie-disclaimer-dpl3`-Element, greift auf sein `shadowRoot` zu,
-     * und klickt auf den Button `.ba-btn-contrast`, um die Cookie-Bestätigung abzuschließen, falls vorhanden.
-     */
+  /**
+  * Sucht nach dem `bahf-cookie-disclaimer-dpl3`-Element, greift auf sein `shadowRoot` zu,
+  * und klickt auf den Button `.ba-btn-contrast`, um die Cookie-Bestätigung abzuschließen, falls vorhanden.
+  */
+  await page.evaluate(async (arbeitsBezeichnungen, ort) => {
     const rootElement = document.querySelector('bahf-cookie-disclaimer-dpl3');
-    let cookieButton: HTMLButtonElement | null = null;
-
     if (rootElement && rootElement.shadowRoot) {
-      cookieButton = rootElement.shadowRoot.querySelector('.ba-btn-contrast');
-      cookieButton && await page.click('input[type="submit"]');
+      const cookieButton = rootElement.shadowRoot.querySelector('.ba-btn-contrast') as HTMLButtonElement | null;
+      if (cookieButton) {
+        cookieButton.click();
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
     }
-
-    /**
-     * Füllt das erste Eingabefeld mit der Arbeitsbezeichnung und das zweite mit dem Ort aus,
-     * und klickt anschließend auf den Submit-Button.
-     */
-    // const searchformInputs = document.querySelectorAll('.form_control') as NodeListOf<HTMLInputElement>;
-		// const searchformButton = document.getElementById('btn-stellen-finden') as HTMLButtonElement;
-
-    // searchformInputs.forEach((formInput: HTMLInputElement) => {
-    //   if (formInput.id === "was-input") formInput.value = arbeitsBezeichnungen;
-    //   if (formInput.id === "wo-input") formInput.value = ort;
-		// 	formInput.dispatchEvent(new Event('input'));
-    // });
-
-		// searchformButton && searchformButton.click();
-
-		await browser.close();
   }, arbeitsBezeichnungen, ort);
 
+      /**
+   * Füllt das erste Eingabefeld mit der Arbeitsbezeichnung und das zweite mit dem Ort aus,
+   * und klickt anschließend auf den Submit-Button.
+   */
+      await page.type('#was-input', arbeitsBezeichnungen, {delay: 100});
+      await page.type('#wo-input', ort, {delay: 100});
+  
   // await browser.close();
 }
 
