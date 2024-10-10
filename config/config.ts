@@ -14,9 +14,9 @@ export const jobSuchKonfiguration: JobSuchKonfiguration = {
 	 */
 	arbeitsBezeichnungen: [
 	'Fachinformatiker/in Anwendungsentwicklung', 
-	'Webentwickler', 
-	'Webentwickler Backend', 
-	'Full-Stack Web-Entwickler/in'
+	// 'Webentwickler', 
+	// 'Webentwickler Backend', 
+	// 'Full-Stack Web-Entwickler/in'
 	],
 	/**
 	 * ort: Ort oder Region, in der nach Arbeitsplätzen gesucht werden soll.
