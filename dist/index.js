@@ -16,19 +16,29 @@ const puppeteer_1 = __importDefault(require("puppeteer"));
 const config_1 = require("./config/config");
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
-function scrapeJobs(arbeitsBezeichnungen) {
+/**
+ * Scrapes job data from a specified URL.
+ * @param config - The configuration object containing search criteria and URL.
+ * @returns Promise<string | null> - The text content of the anchor tag or null if not found.
+ */
+function scrapeJobs(config) {
     return __awaiter(this, void 0, void 0, function* () {
-        const browser = yield puppeteer_1.default.launch({ headless: true });
+        const browser = yield puppeteer_1.default.launch({ headless: false });
         const page = yield browser.newPage();
-        yield page.goto(arbeitsBezeichnungen.url, { waitUntil: 'networkidle2' });
+        yield page.goto(config.url, { waitUntil: 'networkidle2' });
         const jobs = yield page.evaluate(() => {
+            const cookieButton = document.querySelector('ba-btn-contrast');
+            const anchorTag = document.getElementById('meine-vormerkungen-link');
+            console.log(cookieButton);
         });
         yield browser.close();
-        return jobs;
     });
 }
+/**
+ * Displays job data in a console table format.
+ * @param jobs - The job data to display.
+ */
 const displayJobs = (jobs) => console.table(jobs);
 (() => __awaiter(void 0, void 0, void 0, function* () {
-    const jobs = yield scrapeJobs(config_1.jobSuchKonfiguration);
-    displayJobs(jobs);
+    const anchorTagText = yield scrapeJobs(config_1.jobSuchKonfiguration);
 }))();
