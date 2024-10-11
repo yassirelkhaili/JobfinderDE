@@ -27,7 +27,7 @@ async function scrapeJobs(config: JobSuchKonfiguration): Promise<void> {
   * Sucht nach dem `bahf-cookie-disclaimer-dpl3`-Element, greift auf sein `shadowRoot` zu,
   * und klickt auf den Button `.ba-btn-contrast`, um die Cookie-Bestätigung abzuschließen, falls vorhanden.
   */
-  await page.evaluate(async (arbeitsBezeichnungen, ort) => {
+  await page.evaluate(async () => {
     const rootElement = document.querySelector('bahf-cookie-disclaimer-dpl3');
     if (rootElement && rootElement.shadowRoot) {
       const cookieButton = rootElement.shadowRoot.querySelector('.ba-btn-contrast') as HTMLButtonElement | null;
@@ -36,7 +36,7 @@ async function scrapeJobs(config: JobSuchKonfiguration): Promise<void> {
         await new Promise(resolve => setTimeout(resolve, 1000));
       }
     }
-  }, arbeitsBezeichnungen, ort);
+  });
 
       /**
    * Füllt das erste Eingabefeld mit der Arbeitsbezeichnung und das zweite mit dem Ort aus,
@@ -44,7 +44,11 @@ async function scrapeJobs(config: JobSuchKonfiguration): Promise<void> {
    */
       await page.type('#was-input', arbeitsBezeichnungen, {delay: 100});
       await page.type('#wo-input', ort, {delay: 100});
+      await page.click('#btn-stellen-finden');
   
+      await page.waitForSelector('#ergebnis-container', { timeout: 10000 }).then(() => {
+        
+      }).catch((error) => console.warn(error));
   // await browser.close();
 }
 

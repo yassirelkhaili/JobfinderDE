@@ -35,13 +35,14 @@ async function scrapeJobs(config) {
                 await new Promise(resolve => setTimeout(resolve, 1000));
             }
         }
-        /**
-       * Füllt das erste Eingabefeld mit der Arbeitsbezeichnung und das zweite mit dem Ort aus,
-       * und klickt anschließend auf den Submit-Button.
-       */
-        await page.type('#was-input', arbeitsBezeichnungen, { delay: 100 });
-        await page.type('#wo-input', ort, { delay: 100 });
     }, arbeitsBezeichnungen, ort);
+    /**
+ * Füllt das erste Eingabefeld mit der Arbeitsbezeichnung und das zweite mit dem Ort aus,
+ * und klickt anschließend auf den Submit-Button.
+ */
+    await page.type('#was-input', arbeitsBezeichnungen, { delay: 100 });
+    await page.type('#wo-input', ort, { delay: 100 });
+    await page.click('#btn-stellen-finden');
     // await browser.close();
 }
 /**
