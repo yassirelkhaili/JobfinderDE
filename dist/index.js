@@ -14,54 +14,63 @@ dotenv_1.default.config();
  * @returns Promise<Job[]> - Führt die Scrape-Aktion aus und gibt nichts zurück.
  */
 async function scrapeJobs(config) {
-    const browser = await puppeteer_1.default.launch({ headless: false });
-    const page = await browser.newPage();
-    // Öffnet die URL und wartet, bis die Seite vollständig geladen ist
-    await page.goto(config.url, { waitUntil: 'networkidle2' });
-    // Parse the values for arbeitsBezeichnungen and ort
-    const arbeitsBezeichnungen = helperService_1.default.parseArbeitsBezeichnungen(config['arbeitsBezeichnungen']);
-    const ort = config['ort'];
-    // Führt die Evaluierungsfunktion auf der Seite aus
-    /**
-    * Sucht nach dem `bahf-cookie-disclaimer-dpl3`-Element, greift auf sein `shadowRoot` zu,
-    * und klickt auf den Button `.ba-btn-contrast`, um die Cookie-Bestätigung abzuschließen, falls vorhanden.
-    */
-    await page.evaluate(async () => {
-        const rootElement = document.querySelector('bahf-cookie-disclaimer-dpl3');
-        if (rootElement && rootElement.shadowRoot) {
-            const cookieButton = rootElement.shadowRoot.querySelector('.ba-btn-contrast');
-            if (cookieButton) {
-                cookieButton.click();
-                await new Promise(resolve => setTimeout(resolve, 1000));
+    try {
+        const browser = await puppeteer_1.default.launch({ headless: false });
+        const page = await browser.newPage();
+        // Öffnet die URL und wartet, bis die Seite vollständig geladen ist
+        await page.goto(config.url, { waitUntil: 'networkidle2' });
+        // Parse the values for arbeitsBezeichnungen and ort
+        const arbeitsBezeichnungen = helperService_1.default.parseArbeitsBezeichnungen(config['arbeitsBezeichnungen']);
+        const ort = config['ort'];
+        // Führt die Evaluierungsfunktion auf der Seite aus
+        /**
+        * Sucht nach dem `bahf-cookie-disclaimer-dpl3`-Element, greift auf sein `shadowRoot` zu,
+        * und klickt auf den Button `.ba-btn-contrast`, um die Cookie-Bestätigung abzuschließen, falls vorhanden.
+        */
+        await page.evaluate(async () => {
+            const rootElement = document.querySelector('bahf-cookie-disclaimer-dpl3');
+            if (rootElement && rootElement.shadowRoot) {
+                const cookieButton = rootElement.shadowRoot.querySelector('.ba-btn-contrast');
+                if (cookieButton) {
+                    cookieButton.click();
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                }
             }
-        }
-    });
-    /**
- * Füllt das erste Eingabefeld mit der Arbeitsbezeichnung und das zweite mit dem Ort aus,
- * und klickt anschließend auf den Submit-Button.
- */
-    await page.type('#was-input', arbeitsBezeichnungen, { delay: 100 });
-    await page.type('#wo-input', ort, { delay: 100 });
-    await page.click('#btn-stellen-finden');
-    const selectRadioButtons = async (page, jobSuchKonfiguration) => {
-        try {
-            await page.waitForSelector('#ergebnis-container', { timeout: 10000 });
-            const bezeichnungen = helperService_1.default.parseInputIdSeletor(jobSuchKonfiguration['veröffentlichkeit']);
+        });
+        /**
+     * Füllt das erste Eingabefeld mit der Arbeitsbezeichnung und das zweite mit dem Ort aus,
+     * und klickt anschließend auf den Submit-Button.
+     */
+        await page.type('#was-input', arbeitsBezeichnungen, { delay: 100 });
+        await page.type('#wo-input', ort, { delay: 100 });
+        await page.click('#btn-stellen-finden');
+        await page.waitForSelector('#ergebnis-container', { timeout: 10000 });
+        await page.click('#filter-toggle');
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        const jobSuchKonfigurationsArray = Object.entries(config_1.jobSuchKonfiguration);
+        jobSuchKonfigurationsArray.slice(3).forEach(async ([key, value]) => {
+            const bezeichnungen = helperService_1.default.parseInputIdSelector(value);
             if (bezeichnungen && Array.isArray(bezeichnungen)) {
                 for (const bezeichnung of bezeichnungen) {
-                    await page.click(`input[type="radio"][id="veroeffentlichtseit-${bezeichnung}"]`);
+                    try {
+                        await page.click(`input[id="${key}-${bezeichnung}"]`);
+                    }
+                    catch (error) {
+                        console.warn(`Error has occured: ${error.message}`);
+                    }
                 }
             }
             else {
-                console.warn("Value parsing failed or missing in config.");
+                console.warn("Value parsing failed or value missing in config.");
             }
-        }
-        catch (error) {
-            console.warn(`Error in radio button selection: ${error.message}`);
-        }
-    };
-    await selectRadioButtons(page, config_1.jobSuchKonfiguration);
-    // await browser.close();
+        });
+        await page.click('#footer-button-modales-slide-in-filter');
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        // await browser.close();
+    }
+    catch (error) {
+        console.warn(`Error has occured: ${error.message}`);
+    }
 }
 /**
  * Zeigt Jobdaten in einem Konsolentabellenformat an.

@@ -27,7 +27,7 @@ export const jobSuchKonfiguration: JobSuchKonfiguration = {
 	 * arbeitsZeit: Arbeitszeitoptionen für die Suche.
 	 * Mögliche Werte: 'Vollzeit', 'Teilzeit', 'Homeoffice', 'Alle anzeigen'
 	 */
-	arbeitsZeit: ['Vollzeit'],
+	arbeitszeit: ['Vollzeit'],
 	/**
 	 * befristung: Art des Arbeitsvertrags.
 	 * Mögliche Werte: 'Befristet', 'Unbefristet', 'Alle anzeigen'
@@ -37,7 +37,7 @@ export const jobSuchKonfiguration: JobSuchKonfiguration = {
 	 * veröffentlichkeit: Zeitrahmen, in dem die Stellenanzeigen veröffentlicht wurden.
 	 * Mögliche Werte: 'Heute', 'Gestern', '1 Woche', '2 Wochen', '4 Wochen', 'Alle anzeigen'
 	 */
-	veröffentlichkeit: ['Gestern'],
+	veroeffentlichtseit: ['Gestern'],
 	/**
 	 * berufsfeld: Übergeordnete Berufsfelder, in denen gesucht wird.
 	 * Beispiele finden Sie auf der Seite der Bundesagentur für Arbeit.

@@ -48,19 +48,45 @@ async function scrapeJobs(config: JobSuchKonfiguration): Promise<void> {
       await page.click('#btn-stellen-finden');
 
       await page.waitForSelector('#ergebnis-container', { timeout: 10000 });
-      
-      const bezeichnungen = helperService.parseInputIdSeletor(jobSuchKonfiguration['veröffentlichkeit']);
-      if (bezeichnungen && Array.isArray(bezeichnungen)) {
-        for (const bezeichnung of bezeichnungen) {
-          console.log(bezeichnung);
-          await page.click(`input[id="veroeffentlichtseit-${bezeichnung}"]`);
+
+      await page.click('#filter-toggle');
+
+      await new Promise((resolve: (value?: unknown) => void) => setTimeout(resolve, 1000));
+
+      const jobSuchKonfigurationsArray = Object.entries(jobSuchKonfiguration) as [keyof JobSuchKonfiguration, JobSuchKonfiguration[keyof JobSuchKonfiguration]][];
+      jobSuchKonfigurationsArray.slice(3).forEach(
+        async ([key]) => {
+              try {
+                const dropDownButtonSelector: string = `button[id="${key}-accordion-heading-link"]`;
+                const isCollapsed: boolean = await page.$eval(dropDownButtonSelector, dropDownButton => dropDownButton.classList.contains('collapsed'));
+                if (isCollapsed) await page.click(dropDownButtonSelector);
+              } catch(error: any) {
+                console.warn(`Error has occured: ${error.message}`);
+              }
         }
-      } else {
-        console.warn("Value parsing failed or value missing in config.");
-      }
+    );
+      jobSuchKonfigurationsArray.slice(3).forEach(
+        async ([key, value]) => {
+          const bezeichnungen = helperService.parseInputIdSelector(value);
+          if (bezeichnungen && Array.isArray(bezeichnungen)) {
+            for (const bezeichnung of bezeichnungen) {
+              try {
+                await page.click(`input[id="${key}-${bezeichnung}"]`);
+              } catch(error: any) {
+                console.warn(`Error has occured: ${error.message}`);
+              }
+            }
+          } else {
+            console.warn("Value parsing failed or value missing in config.");
+          }    
+        }
+    );
 
-  // await browser.close();
+      await page.click('#footer-button-modales-slide-in-filter');
 
+      await new Promise((resolve: (value?: unknown) => void) => setTimeout(resolve, 100));
+
+      // await browser.close();
 } catch (error: any) {
   console.warn(`Error has occured: ${error.message}`);
 }

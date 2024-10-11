@@ -1,4 +1,4 @@
-import type { Veröffentlichkeit } from "../types/types";
+import type { JobSuchKonfiguration } from "../types/types";
 
 class HelperService {
     /**
@@ -36,11 +36,15 @@ class HelperService {
      * // Ausgabe: ['heute', '1-woche']
      * ```
      */
-    public parseInputIdSeletor(bezeichnungen: Veröffentlichkeit[]): string[] | null {
+    public parseInputIdSelector(bezeichnungen: JobSuchKonfiguration[keyof JobSuchKonfiguration]): string[] | null {
         let parsedBezeichnungen: string[] | null = [];
-        bezeichnungen.forEach((bezeichnung) => {
-            parsedBezeichnungen.push(bezeichnung.toLowerCase().replace(' ', '-'));
-        });
+        if (Array.isArray(bezeichnungen)) {
+            bezeichnungen.forEach((bezeichnung) => {
+                parsedBezeichnungen.push(bezeichnung.toLowerCase().replace(' ', '-'));
+            });
+        } else {
+            parsedBezeichnungen.push(bezeichnungen.toLowerCase().replace(' ', '-'));
+        }
         return parsedBezeichnungen;
     }
 }
