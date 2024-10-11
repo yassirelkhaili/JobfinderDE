@@ -83,6 +83,10 @@ async function scrapeJobs(config) {
         }
         await page.click('#footer-button-modales-slide-in-filter');
         await new Promise((resolve) => setTimeout(resolve, 100));
+        do {
+            await page.click('#ergebnisliste-ladeweitere-button');
+        } while (await page.$('#ergebnisliste-ladeweitere-button') !== null);
+        // const offerNavigationElements = await page.$$('.your-class-name');
     }
     catch (error) {
         console.warn(`Error has occured: ${error.message}`);

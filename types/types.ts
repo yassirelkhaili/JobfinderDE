@@ -15,10 +15,10 @@ export interface JobSuchKonfiguration {
     url: string;
     arbeitsBezeichnungen: string[];
     ort: string;
-    arbeitszeit: ArbeitsZeit[];
-    befristung: Befristung[];
-    veroeffentlichtseit: Veröffentlichkeit[];
-    berufsfeld: string[];
-    beruf: string[];
-    branche: string[];
+    arbeitszeit?: ArbeitsZeit[];
+    befristung?: Befristung[];
+    veroeffentlichtseit?: Veröffentlichkeit[];
+    berufsfeld?: string[];
+    beruf?: string[];
+    branche?: string[];
 }

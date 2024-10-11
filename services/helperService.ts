@@ -48,7 +48,7 @@ class HelperService {
             modifiedBezeichnung = modifiedBezeichnung.toLowerCase();
             return modifiedBezeichnung;
         };
-        if (Array.isArray(bezeichnungen)) parsedBezeichnungen = bezeichnungen.map(parseBezeichnung); else parsedBezeichnungen.push(parseBezeichnung(bezeichnungen));
+        if (Array.isArray(bezeichnungen)) parsedBezeichnungen = bezeichnungen.map(parseBezeichnung); else bezeichnungen && parsedBezeichnungen.push(parseBezeichnung(bezeichnungen));
         return parsedBezeichnungen;
     }
 

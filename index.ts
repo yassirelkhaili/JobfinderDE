@@ -92,6 +92,12 @@ async function scrapeJobs(config: JobSuchKonfiguration): Promise<void> {
 
       await new Promise((resolve: (value?: unknown) => void) => setTimeout(resolve, 100));
 
+      do {
+        await page.click('#ergebnisliste-ladeweitere-button');
+        await new Promise(resolve => setTimeout(resolve, 800));
+      } while (await page.$('#ergebnisliste-ladeweitere-button') !== null);
+
+      // const offerNavigationElements = await page.$$('.your-class-name');
 } catch (error: any) {
   console.warn(`Error has occured: ${error.message}`);
 } finally {
