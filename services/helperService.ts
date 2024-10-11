@@ -1,3 +1,5 @@
+import { mkdir, writeFile } from 'fs/promises';
+import { join } from 'path';
 import type { JobSuchKonfiguration } from "../types/types";
 
 class HelperService {
@@ -36,23 +38,37 @@ class HelperService {
      * // Ausgabe: ['heute', '1-woche']
      * ```
      */
-    public parseInputIdSelector(bezeichnungen: JobSuchKonfiguration[keyof JobSuchKonfiguration]): string[] | null {
-        let parsedBezeichnungen: string[] | null = [];
+    public parseInputIdSelector(bezeichnungen: JobSuchKonfiguration[keyof JobSuchKonfiguration]): string[] {
+        let parsedBezeichnungen: string[] = [];
         const placeholder = '__HYPHEN_PLACEHOLDER__';
-        if (Array.isArray(bezeichnungen)) {
-            bezeichnungen.forEach((bezeichnung) => {
+        const parseBezeichnung = (bezeichnung: string): string => {
             let modifiedBezeichnung = bezeichnung.replace(/ - /g, placeholder);
-            modifiedBezeichnung = modifiedBezeichnung.toLowerCase().replace(/[\s/]/g, '-');
-            modifiedBezeichnung = modifiedBezeichnung.replace(new RegExp(placeholder, 'g'), ' - ');
-            parsedBezeichnungen.push(modifiedBezeichnung);
-            });
-        } else {
-            let modifiedBezeichnung = bezeichnungen.replace(/ - /g, placeholder);
-            modifiedBezeichnung = modifiedBezeichnung.toLowerCase().replace(/[\s/]/g, '-');
-            modifiedBezeichnung = modifiedBezeichnung.replace(new RegExp(placeholder, 'g'), ' - ');
-            parsedBezeichnungen.push(modifiedBezeichnung);
-        }
+            modifiedBezeichnung = modifiedBezeichnung.replace(/[\s/]/g, '-');
+            modifiedBezeichnung = modifiedBezeichnung.replace(new RegExp(placeholder, 'g'), '-');
+            modifiedBezeichnung = modifiedBezeichnung.toLowerCase();
+            return modifiedBezeichnung;
+        };
+        if (Array.isArray(bezeichnungen)) parsedBezeichnungen = bezeichnungen.map(parseBezeichnung); else parsedBezeichnungen.push(parseBezeichnung(bezeichnungen));
         return parsedBezeichnungen;
+    }
+
+    public async logScrappingResults(scrappingResults: string): Promise<string> {
+        let response: string = '';
+        try {
+            const now = new Date();
+            const folderPath = './dump';
+            await mkdir('./dump', { recursive: true });
+            const fileName = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}_${now.getHours().toString().padStart(2, '0')}-${now.getMinutes().toString().padStart(2, '0')}-${now.getSeconds().toString().padStart(2, '0')}.log`;
+            const filePath = join(folderPath, fileName);
+            const timestamp = now.toISOString();
+            const logEntry = `${timestamp}: ${scrappingResults}\n`;
+            await writeFile(filePath, logEntry);
+            response = `Scrapping results written to ${filePath}`;
+            return response;
+          } catch (error) {
+            response = `Error writing to log file: ${error}`;
+            return response;
+          }
     }
 }
 

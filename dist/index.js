@@ -14,8 +14,9 @@ dotenv_1.default.config();
  * @returns Promise<Job[]> - Führt die Scrape-Aktion aus und gibt nichts zurück.
  */
 async function scrapeJobs(config) {
+    let browser; // intiate browser instance
     try {
-        const browser = await puppeteer_1.default.launch({ headless: false });
+        browser = await puppeteer_1.default.launch({ headless: false });
         const page = await browser.newPage();
         // Öffnet die URL und wartet, bis die Seite vollständig geladen ist
         await page.goto(config.url, { waitUntil: 'networkidle2' });
@@ -86,6 +87,9 @@ async function scrapeJobs(config) {
     catch (error) {
         console.warn(`Error has occured: ${error.message}`);
     }
+    finally {
+        // if (browser) await browser.close();
+    }
 }
 /**
  * Zeigt Jobdaten in einem Konsolentabellenformat an.
@@ -94,5 +98,5 @@ async function scrapeJobs(config) {
 const displayJobs = (jobs) => console.table(jobs);
 (async () => {
     // Führt die Job-Scrape-Funktion aus und zeigt die Ergebnisse an
-    const anchorTagText = await scrapeJobs(config_1.jobSuchKonfiguration);
+    await scrapeJobs(config_1.jobSuchKonfiguration);
 })();

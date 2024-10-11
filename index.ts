@@ -1,4 +1,4 @@
-import puppeteer, { Page } from "puppeteer";
+import puppeteer from "puppeteer";
 import { jobSuchKonfiguration } from "./config/config";
 import dotenv from 'dotenv';
 import helperService from "./services/helperService";
@@ -12,8 +12,9 @@ dotenv.config();
  * @returns Promise<Job[]> - Führt die Scrape-Aktion aus und gibt nichts zurück.
  */
 async function scrapeJobs(config: JobSuchKonfiguration): Promise<void> {
+  let browser; // intiate browser instance
   try {
-  const browser = await puppeteer.launch({ headless: false });
+  browser = await puppeteer.launch({ headless: false });
   const page = await browser.newPage();
 
   // Öffnet die URL und wartet, bis die Seite vollständig geladen ist
@@ -93,6 +94,8 @@ async function scrapeJobs(config: JobSuchKonfiguration): Promise<void> {
 
 } catch (error: any) {
   console.warn(`Error has occured: ${error.message}`);
+} finally {
+  // if (browser) await browser.close();
 }
 }
 
