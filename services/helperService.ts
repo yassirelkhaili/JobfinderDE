@@ -38,12 +38,19 @@ class HelperService {
      */
     public parseInputIdSelector(bezeichnungen: JobSuchKonfiguration[keyof JobSuchKonfiguration]): string[] | null {
         let parsedBezeichnungen: string[] | null = [];
+        const placeholder = '__HYPHEN_PLACEHOLDER__';
         if (Array.isArray(bezeichnungen)) {
             bezeichnungen.forEach((bezeichnung) => {
-                parsedBezeichnungen.push(bezeichnung.toLowerCase().replace(' ', '-'));
+            let modifiedBezeichnung = bezeichnung.replace(/ - /g, placeholder);
+            modifiedBezeichnung = modifiedBezeichnung.toLowerCase().replace(/[\s/]/g, '-');
+            modifiedBezeichnung = modifiedBezeichnung.replace(new RegExp(placeholder, 'g'), ' - ');
+            parsedBezeichnungen.push(modifiedBezeichnung);
             });
         } else {
-            parsedBezeichnungen.push(bezeichnungen.toLowerCase().replace(' ', '-'));
+            let modifiedBezeichnung = bezeichnungen.replace(/ - /g, placeholder);
+            modifiedBezeichnung = modifiedBezeichnung.toLowerCase().replace(/[\s/]/g, '-');
+            modifiedBezeichnung = modifiedBezeichnung.replace(new RegExp(placeholder, 'g'), ' - ');
+            parsedBezeichnungen.push(modifiedBezeichnung);
         }
         return parsedBezeichnungen;
     }
