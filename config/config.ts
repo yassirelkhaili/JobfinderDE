@@ -25,19 +25,19 @@ export const jobSuchKonfiguration: JobSuchKonfiguration = {
 	ort: 'Deutschland (Land)',
 	/**
 	 * arbeitsZeit: Arbeitszeitoptionen für die Suche.
-	 * Mögliche Werte: 'Vollzeit', 'Teilzeit', 'Homeoffice', 'Alle'
+	 * Mögliche Werte: 'Vollzeit', 'Teilzeit', 'Homeoffice', 'Alle anzeigen'
 	 */
 	arbeitsZeit: ['Vollzeit'],
 	/**
 	 * befristung: Art des Arbeitsvertrags.
-	 * Mögliche Werte: 'Befristet', 'Unbefristet', 'Alle'
+	 * Mögliche Werte: 'Befristet', 'Unbefristet', 'Alle anzeigen'
 	 */
 	befristung: ['Unbefristet'],
 	/**
 	 * veröffentlichkeit: Zeitrahmen, in dem die Stellenanzeigen veröffentlicht wurden.
-	 * Mögliche Werte: 'Heute', 'Gestern', '1 Woche', '2 Wochen', '4 Wochen', 'Alle'
+	 * Mögliche Werte: 'Heute', 'Gestern', '1 Woche', '2 Wochen', '4 Wochen', 'Alle anzeigen'
 	 */
-	veröffentlichkeit: ['Alle'],
+	veröffentlichkeit: ['Gestern'],
 	/**
 	 * berufsfeld: Übergeordnete Berufsfelder, in denen gesucht wird.
 	 * Beispiele finden Sie auf der Seite der Bundesagentur für Arbeit.

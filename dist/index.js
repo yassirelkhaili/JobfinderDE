@@ -26,7 +26,7 @@ async function scrapeJobs(config) {
     * Sucht nach dem `bahf-cookie-disclaimer-dpl3`-Element, greift auf sein `shadowRoot` zu,
     * und klickt auf den Button `.ba-btn-contrast`, um die Cookie-Bestätigung abzuschließen, falls vorhanden.
     */
-    await page.evaluate(async (arbeitsBezeichnungen, ort) => {
+    await page.evaluate(async () => {
         const rootElement = document.querySelector('bahf-cookie-disclaimer-dpl3');
         if (rootElement && rootElement.shadowRoot) {
             const cookieButton = rootElement.shadowRoot.querySelector('.ba-btn-contrast');
@@ -35,7 +35,7 @@ async function scrapeJobs(config) {
                 await new Promise(resolve => setTimeout(resolve, 1000));
             }
         }
-    }, arbeitsBezeichnungen, ort);
+    });
     /**
  * Füllt das erste Eingabefeld mit der Arbeitsbezeichnung und das zweite mit dem Ort aus,
  * und klickt anschließend auf den Submit-Button.
@@ -43,6 +43,24 @@ async function scrapeJobs(config) {
     await page.type('#was-input', arbeitsBezeichnungen, { delay: 100 });
     await page.type('#wo-input', ort, { delay: 100 });
     await page.click('#btn-stellen-finden');
+    const selectRadioButtons = async (page, jobSuchKonfiguration) => {
+        try {
+            await page.waitForSelector('#ergebnis-container', { timeout: 10000 });
+            const bezeichnungen = helperService_1.default.parseInputIdSeletor(jobSuchKonfiguration['veröffentlichkeit']);
+            if (bezeichnungen && Array.isArray(bezeichnungen)) {
+                for (const bezeichnung of bezeichnungen) {
+                    await page.click(`input[type="radio"][id="veroeffentlichtseit-${bezeichnung}"]`);
+                }
+            }
+            else {
+                console.warn("Value parsing failed or missing in config.");
+            }
+        }
+        catch (error) {
+            console.warn(`Error in radio button selection: ${error.message}`);
+        }
+    };
+    await selectRadioButtons(page, config_1.jobSuchKonfiguration);
     // await browser.close();
 }
 /**

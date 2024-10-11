@@ -1,3 +1,5 @@
+import type { Veröffentlichkeit } from "../types/types";
+
 class HelperService {
     /**
     * Konvertiert den Eingabewert `bezeichnungen` in einen einzelnen String.
@@ -16,6 +18,30 @@ class HelperService {
             return bezeichnungen.join(' ');
         }
         return '';
+    }
+
+    /**
+     * Formatiert `Veröffentlichkeit`-Strings für HTML-IDs.
+     *
+     * Diese Methode konvertiert ein Array von `Veröffentlichkeit`-Werten (z.B. 'Gestern', '1 Woche') 
+     * in kleingeschriebene, mit Bindestrichen getrennte Strings. Diese Ausgabe ist nützlich, um HTML-Elemente 
+     * mit IDs wie `veroeffentlichkeit-1-woche` im Browser zu finden.
+     *
+     * @param {Veröffentlichkeit[]} bezeichnungen - Ein Array von Veröffentlichungszeitpunkt-Strings.
+     * @returns {string[] | null} - Ein Array von formatierten Strings oder `null`, wenn das Array leer ist.
+     *
+     * Beispiel:
+     * ```typescript
+     * const parsedIds = parseInputIdSelector(['Heute', '1 Woche']);
+     * // Ausgabe: ['heute', '1-woche']
+     * ```
+     */
+    public parseInputIdSeletor(bezeichnungen: Veröffentlichkeit[]): string[] | null {
+        let parsedBezeichnungen: string[] | null = [];
+        bezeichnungen.forEach((bezeichnung) => {
+            parsedBezeichnungen.push(bezeichnung.toLowerCase().replace(' ', '-'));
+        });
+        return parsedBezeichnungen;
     }
 }
 

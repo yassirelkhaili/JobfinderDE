@@ -1,4 +1,4 @@
-import puppeteer from "puppeteer";
+import puppeteer, { Page } from "puppeteer";
 import { jobSuchKonfiguration } from "./config/config";
 import dotenv from 'dotenv';
 import helperService from "./services/helperService";
@@ -12,6 +12,7 @@ dotenv.config();
  * @returns Promise<Job[]> - Führt die Scrape-Aktion aus und gibt nichts zurück.
  */
 async function scrapeJobs(config: JobSuchKonfiguration): Promise<void> {
+  try {
   const browser = await puppeteer.launch({ headless: false });
   const page = await browser.newPage();
 
@@ -45,11 +46,24 @@ async function scrapeJobs(config: JobSuchKonfiguration): Promise<void> {
       await page.type('#was-input', arbeitsBezeichnungen, {delay: 100});
       await page.type('#wo-input', ort, {delay: 100});
       await page.click('#btn-stellen-finden');
-  
-      await page.waitForSelector('#ergebnis-container', { timeout: 10000 }).then(() => {
-        
-      }).catch((error) => console.warn(error));
+
+      await page.waitForSelector('#ergebnis-container', { timeout: 10000 });
+      
+      const bezeichnungen = helperService.parseInputIdSeletor(jobSuchKonfiguration['veröffentlichkeit']);
+      if (bezeichnungen && Array.isArray(bezeichnungen)) {
+        for (const bezeichnung of bezeichnungen) {
+          console.log(bezeichnung);
+          await page.click(`input[id="veroeffentlichtseit-${bezeichnung}"]`);
+        }
+      } else {
+        console.warn("Value parsing failed or value missing in config.");
+      }
+
   // await browser.close();
+
+} catch (error: any) {
+  console.warn(`Error has occured: ${error.message}`);
+}
 }
 
 /**
