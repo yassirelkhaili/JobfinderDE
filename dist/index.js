@@ -17,28 +17,32 @@ const config_1 = require("./config/config");
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 /**
- * Scrapes job data from a specified URL.
- * @param config - The configuration object containing search criteria and URL.
- * @returns Promise<string | null> - The text content of the anchor tag or null if not found.
+ * Extrahiert Jobdaten von einer angegebenen URL.
+ * @param config - Das Konfigurationsobjekt, das Suchkriterien und die URL enthält.
+ * @returns Promise<void> - Führt die Scrape-Aktion aus und gibt nichts zurück.
  */
 function scrapeJobs(config) {
     return __awaiter(this, void 0, void 0, function* () {
         const browser = yield puppeteer_1.default.launch({ headless: false });
         const page = yield browser.newPage();
+        // Öffnet die URL und wartet, bis die Seite vollständig geladen ist
         yield page.goto(config.url, { waitUntil: 'networkidle2' });
+        // Führt die Evaluierungsfunktion auf der Seite aus
         const jobs = yield page.evaluate(() => {
-            const cookieButton = document.querySelector('ba-btn-contrast');
             const anchorTag = document.getElementById('meine-vormerkungen-link');
-            console.log(cookieButton);
+            const cookieButton = document.querySelector('bahf-cookie-disclaimer-dpl3.hydrated');
+            return cookieButton === null || cookieButton === void 0 ? void 0 : cookieButton.tagName;
         });
+        console.log(jobs);
         yield browser.close();
     });
 }
 /**
- * Displays job data in a console table format.
- * @param jobs - The job data to display.
+ * Zeigt Jobdaten in einem Konsolentabellenformat an.
+ * @param jobs - Die anzuzeigenden Jobdaten.
  */
 const displayJobs = (jobs) => console.table(jobs);
 (() => __awaiter(void 0, void 0, void 0, function* () {
+    // Führt die Job-Scrape-Funktion aus und zeigt die Ergebnisse an
     const anchorTagText = yield scrapeJobs(config_1.jobSuchKonfiguration);
 }))();

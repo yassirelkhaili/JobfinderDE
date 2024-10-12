@@ -19,12 +19,13 @@ async function scrapeJobs(config: JobSuchKonfiguration): Promise<void> {
 
   // Führt die Evaluierungsfunktion auf der Seite aus
   const jobs = await page.evaluate(() => {
-    const cookieButton = document.querySelector('.ba-btn-contrast') as HTMLButtonElement;
     const anchorTag = document.getElementById('meine-vormerkungen-link') as HTMLAnchorElement;
-    console.log(cookieButton);
+    const cookieButton = document.querySelector('bahf-cookie-disclaimer-dpl3.hydrated') as HTMLDivElement;
+    if (cookieButton && cookieButton.shadowRoot) {
+      const ConfirmCookieChoice = cookieButton.shadowRoot.querySelector('button');
+      ConfirmCookieChoice?.click();
+    }
   });
-
-  await browser.close();
 }
 
 /**
