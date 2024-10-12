@@ -52,24 +52,24 @@ class HelperService {
         return parsedBezeichnungen;
     }
 
-    public async logScrappingResults(scrappingResults: string): Promise<string> {
+    public async logScrappingResults(scrappingResults: string[]): Promise<string> {
         let response: string = '';
         try {
-            const now = new Date();
-            const folderPath = './dump';
-            await mkdir('./dump', { recursive: true });
-            const fileName = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}_${now.getHours().toString().padStart(2, '0')}-${now.getMinutes().toString().padStart(2, '0')}-${now.getSeconds().toString().padStart(2, '0')}.log`;
-            const filePath = join(folderPath, fileName);
-            const timestamp = now.toISOString();
-            const logEntry = `${timestamp}: ${scrappingResults}\n`;
-            await writeFile(filePath, logEntry);
-            response = `Scrapping results written to ${filePath}`;
-            return response;
-          } catch (error) {
-            response = `Error writing to log file: ${error}`;
-            return response;
-          }
-    }
+          const now = new Date();
+          const folderPath = './dump';
+          await mkdir(folderPath, { recursive: true });
+          const fileName = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}_${now.getHours().toString().padStart(2, '0')}-${now.getMinutes().toString().padStart(2, '0')}-${now.getSeconds().toString().padStart(2, '0')}.log`;
+          const filePath = join(folderPath, fileName);
+          const timestamp = now.toISOString();
+          const logEntries = scrappingResults.map((result, index) => `${timestamp} - Job Offer ${index + 1}: ${result}\n`).join('');
+          await writeFile(filePath, logEntries);
+          response = `Scraping results written to ${filePath}`;
+          return response;
+        } catch (error) {
+          throw new Error(`Error writing to log file: ${error}`);
+        }
+      }
+      
 }
 
 const helperService = new HelperService();

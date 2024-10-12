@@ -109,19 +109,45 @@ async function scrapeJobs(config: JobSuchKonfiguration): Promise<void> {
       setTimeout(resolve, 100)
     );
 
-    async function clickButtonUntilGone(page: Page) {
-      const button = await page.$('#ergebnisliste-ladeweitere-button');
-      if (button === null) {
-        return;
-      }
+    async function clickButtonUntilGone(page: Page, iterations = 2) {
+      const button = await page.$("#ergebnisliste-ladeweitere-button");
+      if (button === null) return;
+      await new Promise((resolve: (value?: unknown) => void) => setTimeout(resolve, 500));
       await button.click();
-      await page.waitForSelector('', )
-      await clickButtonUntilGone(page);
+      await page.waitForSelector(`#divider-${iterations}`, { timeout: 5000 });
+      await clickButtonUntilGone(page, ++iterations);
     }
-    
+
     await clickButtonUntilGone(page);
 
-    // const offerNavigationElements = await page.$$('.your-class-name');
+    const offerNavigationElements = await page.$$('.ergebnisliste-item');
+
+    const scrapeJobs = async (): Promise<string[]> => {
+      let jobOffers: string[] = [];
+      if (offerNavigationElements) {
+        for (const jobOfferNavigationLink of offerNavigationElements) {
+          try {
+            await jobOfferNavigationLink.click();
+            await new Promise((resolve: (value?: unknown) => void) => setTimeout(resolve, 500));
+            const offerDescriptionContainer = await page.waitForSelector(`#detail-beschreibung-beschreibung`, { timeout: 5000 });
+            if (offerDescriptionContainer) {
+              const descriptionText = await offerDescriptionContainer.evaluate(el => (el as HTMLElement).innerText);
+              jobOffers.push(descriptionText);
+            } else {
+              console.log(console.warn('Error has occured: job offer scrapping not successful'));
+            }
+          } catch (error: any) {
+            console.warn(`Error has occured: ${error.message}`);
+          }
+        }
+      } else {
+        console.warn('Error has occured: no job offers detected');
+      }
+      return jobOffers;
+    }
+
+    const scrappingResults = await scrapeJobs();
+    helperService.logScrappingResults(scrappingResults);
   } catch (error: any) {
     console.warn(`Error has occured: ${error.message}`);
   } finally {

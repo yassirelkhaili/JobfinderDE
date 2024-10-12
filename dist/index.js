@@ -83,16 +83,17 @@ async function scrapeJobs(config) {
         }
         await page.click("#footer-button-modales-slide-in-filter");
         await new Promise((resolve) => setTimeout(resolve, 100));
-        async function clickButtonUntilGone(page) {
-            const button = await page.$('#ergebnisliste-ladeweitere-button');
-            if (button === null) {
+        async function clickButtonUntilGone(page, iterations = 2) {
+            const button = await page.$("#ergebnisliste-ladeweitere-button");
+            if (button === null)
                 return;
-            }
+            await new Promise((resolve) => setTimeout(resolve, 500));
             await button.click();
-            await clickButtonUntilGone(page);
+            await page.waitForSelector(`#divider-${iterations}`, { timeout: 5000 });
+            await clickButtonUntilGone(page, ++iterations);
         }
         await clickButtonUntilGone(page);
-        // const offerNavigationElements = await page.$$('.your-class-name');
+        const offerNavigationElements = await page.$$('.ergebnisliste-item');
     }
     catch (error) {
         console.warn(`Error has occured: ${error.message}`);
