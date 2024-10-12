@@ -15,6 +15,8 @@ dotenv_1.default.config();
  */
 async function scrapeJobs(config) {
     let browser; // intiate browser instance
+    let userResponse;
+    const chalk = (await import('chalk')).default;
     try {
         browser = await puppeteer_1.default.launch({ headless: false });
         const page = await browser.newPage();
@@ -94,19 +96,50 @@ async function scrapeJobs(config) {
         }
         await clickButtonUntilGone(page);
         const offerNavigationElements = await page.$$('.ergebnisliste-item');
+        const scrapeJobs = async () => {
+            let jobOffers = [];
+            if (offerNavigationElements) {
+                for (const jobOfferNavigationLink of offerNavigationElements) {
+                    try {
+                        await jobOfferNavigationLink.click();
+                        await new Promise((resolve) => setTimeout(resolve, 500));
+                        const offerDescriptionContainer = await page.waitForSelector(`#detail-beschreibung-beschreibung`, { timeout: 5000 });
+                        if (offerDescriptionContainer) {
+                            const descriptionText = await offerDescriptionContainer.evaluate(el => el.innerText);
+                            jobOffers.push(descriptionText);
+                        }
+                        else {
+                            console.warn('Error has occured: job offer scrapping not successful');
+                        }
+                    }
+                    catch (error) {
+                        console.warn(`Error has occured: ${error.message}`);
+                    }
+                }
+            }
+            else {
+                console.warn('Error has occured: no job offers detected');
+            }
+            return jobOffers;
+        };
+        const scrappingResults = await scrapeJobs();
+        try {
+            userResponse = helperService_1.default.logScrappingResults(scrappingResults);
+        }
+        catch (error) {
+            console.warn(error);
+        }
     }
     catch (error) {
         console.warn(`Error has occured: ${error.message}`);
     }
     finally {
-        // if (browser) await browser.close();
+        console.log(chalk.green('Job scrapping finished'));
+        console.log(chalk.green(userResponse));
+        if (browser)
+            await browser.close();
     }
 }
-/**
- * Zeigt Jobdaten in einem Konsolentabellenformat an.
- * @param jobs - Die anzuzeigenden Jobdaten.
- */
-const displayJobs = (jobs) => console.table(jobs);
 (async () => {
     // Führt die Job-Scrape-Funktion aus und zeigt die Ergebnisse an
     await scrapeJobs(config_1.jobSuchKonfiguration);

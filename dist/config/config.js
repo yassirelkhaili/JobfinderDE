@@ -30,7 +30,7 @@ exports.jobSuchKonfiguration = {
      * arbeitsZeit: Arbeitszeitoptionen für die Suche.
      * Mögliche Werte: 'Vollzeit', 'Teilzeit', 'Homeoffice', 'Alle anzeigen'
      */
-    // arbeitszeit: ['Vollzeit'],
+    arbeitszeit: ['Teilzeit'],
     /**
      * optional
      * befristung: Art des Arbeitsvertrags.
@@ -42,7 +42,7 @@ exports.jobSuchKonfiguration = {
      * veröffentlichkeit: Zeitrahmen, in dem die Stellenanzeigen veröffentlicht wurden.
      * Mögliche Werte: 'Heute', 'Gestern', '1 Woche', '2 Wochen', '4 Wochen', 'Alle anzeigen'
      */
-    // veroeffentlichtseit: ['Gestern'],
+    veroeffentlichtseit: ['2 Wochen'],
     /**
      * optional
      * berufsfeld: Übergeordnete Berufsfelder, in denen gesucht wird.

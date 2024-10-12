@@ -58,7 +58,7 @@ class HelperService {
           const now = new Date();
           const folderPath = './dump';
           await mkdir(folderPath, { recursive: true });
-          const fileName = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}_${now.getHours().toString().padStart(2, '0')}-${now.getMinutes().toString().padStart(2, '0')}-${now.getSeconds().toString().padStart(2, '0')}.log`;
+          const fileName = `${now}.log`;
           const filePath = join(folderPath, fileName);
           const timestamp = now.toISOString();
           const logEntries = scrappingResults.map((result, index) => `${timestamp} - Job Offer ${index + 1}: ${result}\n`).join('');

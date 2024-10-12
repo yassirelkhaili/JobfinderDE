@@ -14,6 +14,8 @@ dotenv.config();
  */
 async function scrapeJobs(config: JobSuchKonfiguration): Promise<void> {
   let browser; // intiate browser instance
+  let userResponse;
+  const chalk = (await import('chalk')).default;
   try {
     browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
@@ -129,12 +131,12 @@ async function scrapeJobs(config: JobSuchKonfiguration): Promise<void> {
           try {
             await jobOfferNavigationLink.click();
             await new Promise((resolve: (value?: unknown) => void) => setTimeout(resolve, 500));
-            const offerDescriptionContainer = await page.waitForSelector(`#detail-beschreibung-beschreibung`, { timeout: 5000 });
+            const offerDescriptionContainer = await page.waitForSelector(`#detail-beschreibung-beschreibung`, { timeout: 1000 });
             if (offerDescriptionContainer) {
               const descriptionText = await offerDescriptionContainer.evaluate(el => (el as HTMLElement).innerText);
               jobOffers.push(descriptionText);
             } else {
-              console.log(console.warn('Error has occured: job offer scrapping not successful'));
+              console.warn('Error has occured: job offer scrapping not successful');
             }
           } catch (error: any) {
             console.warn(`Error has occured: ${error.message}`);
@@ -147,19 +149,19 @@ async function scrapeJobs(config: JobSuchKonfiguration): Promise<void> {
     }
 
     const scrappingResults = await scrapeJobs();
-    helperService.logScrappingResults(scrappingResults);
+    try {
+      userResponse = await helperService.logScrappingResults(scrappingResults);
+    } catch (error) {
+      console.warn(error);
+    }
   } catch (error: any) {
     console.warn(`Error has occured: ${error.message}`);
   } finally {
-    // if (browser) await browser.close();
+    console.log(chalk.green('Job scrapping finished'));
+    console.log(chalk.green(userResponse));
+    if (browser) await browser.close();
   }
 }
-
-/**
- * Zeigt Jobdaten in einem Konsolentabellenformat an.
- * @param jobs - Die anzuzeigenden Jobdaten.
- */
-const displayJobs = (jobs: Job[]) => console.table(jobs);
 
 (async () => {
   // Führt die Job-Scrape-Funktion aus und zeigt die Ergebnisse an
