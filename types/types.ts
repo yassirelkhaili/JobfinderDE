@@ -22,3 +22,13 @@ export interface JobSuchKonfiguration {
     beruf?: string[];
     branche?: string[];
 }
+
+export interface Jobanzeige {
+  bezeichnung: string,
+  unternehmen: string,
+  ort: string,
+  veroeffentlichtseit: string,
+  befristung: string,
+  datumseit: string,
+  beschreibung: string
+}

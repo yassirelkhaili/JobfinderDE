@@ -2,7 +2,7 @@ import puppeteer from "puppeteer";
 import { jobSuchKonfiguration } from "./config/config";
 import dotenv from "dotenv";
 import helperService from "./services/helperService";
-import type { JobSuchKonfiguration } from "./types/types";
+import type { JobSuchKonfiguration , Jobanzeige} from "./types/types";
 import type { Page } from "puppeteer";
 
 dotenv.config();
@@ -165,7 +165,6 @@ async function scrapeJobs(config: JobSuchKonfiguration, chalk: any): Promise<voi
       console.log(chalk.green(userResponse));
     }
     if (browser) await browser.close();
-    console.timeEnd('Program Duration');
   }
 }
 
@@ -175,4 +174,5 @@ async function scrapeJobs(config: JobSuchKonfiguration, chalk: any): Promise<voi
   console.log(chalk.green('Scrapping initiated.'));
   // Führt die Job-Scrape-Funktion aus und zeigt die Ergebnisse an
   await scrapeJobs(jobSuchKonfiguration, chalk);
+  console.timeEnd('Program Duration');
 })();
