@@ -1,24 +1,18 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const puppeteer_1 = __importDefault(require("puppeteer"));
-const config_1 = require("./config/config");
-const dotenv_1 = __importDefault(require("dotenv"));
-const helperService_1 = __importDefault(require("./services/helperService"));
-dotenv_1.default.config();
+import puppeteer from "puppeteer";
+import { jobSuchKonfiguration } from "./config/config.js";
+import dotenv from "dotenv";
+import helperService from "./services/helperService.js";
+dotenv.config();
 /**
  * Extrahiert Jobdaten von einer angegebenen URL.
  * @param config - Das Konfigurationsobjekt, das Suchkriterien und die URL enthält.
  * @returns Promise<Job[]> - Führt die Scrape-Aktion aus und gibt nichts zurück.
  */
-async function scrapeJobs(config) {
+async function scrapeJobs(config, chalk) {
     let browser; // intiate browser instance
     let userResponse;
-    const chalk = (await import('chalk')).default;
     try {
-        browser = await puppeteer_1.default.launch({ headless: false });
+        browser = await puppeteer.launch({ headless: false });
         const page = await browser.newPage();
         // Öffnet die URL und wartet, bis die Seite vollständig geladen ist
         await page.goto(config.url, { waitUntil: "networkidle2" });
@@ -26,7 +20,7 @@ async function scrapeJobs(config) {
         await page.deleteCookie(...cookies);
         await page.reload();
         // Parse the values for arbeitsBezeichnungen and ort
-        const arbeitsBezeichnungen = helperService_1.default.parseArbeitsBezeichnungen(config["arbeitsBezeichnungen"]);
+        const arbeitsBezeichnungen = helperService.parseArbeitsBezeichnungen(config["arbeitsBezeichnungen"]);
         const ort = config["ort"];
         // Führt die Evaluierungsfunktion auf der Seite aus
         /**
@@ -51,10 +45,10 @@ async function scrapeJobs(config) {
         await page.type("#was-input", arbeitsBezeichnungen);
         await page.type("#wo-input", ort);
         await page.click("#btn-stellen-finden");
-        await page.waitForSelector("#ergebnis-container", { timeout: 10000 });
+        await page.waitForSelector("#ergebnis-container", { timeout: 800 });
         await page.click("#filter-toggle");
         await new Promise((resolve) => setTimeout(resolve, 1000));
-        const jobSuchKonfigurationsArray = Object.entries(config_1.jobSuchKonfiguration);
+        const jobSuchKonfigurationsArray = Object.entries(jobSuchKonfiguration);
         for (const [key] of jobSuchKonfigurationsArray.slice(3)) {
             try {
                 const dropDownButtonSelector = `button[id="${key}-accordion-heading-link"]`;
@@ -68,7 +62,7 @@ async function scrapeJobs(config) {
         }
         await new Promise((resolve) => setTimeout(resolve, 1000));
         for (const [key, value] of jobSuchKonfigurationsArray.slice(3)) {
-            const bezeichnungen = helperService_1.default.parseInputIdSelector(value);
+            const bezeichnungen = helperService.parseInputIdSelector(value);
             if (bezeichnungen && Array.isArray(bezeichnungen)) {
                 for (const bezeichnung of bezeichnungen) {
                     try {
@@ -130,24 +124,28 @@ async function scrapeJobs(config) {
             return jobOffers;
         };
         const scrappingResults = await scrapeJobs();
-        try {
-            userResponse = await helperService_1.default.logScrappingResults(scrappingResults);
-        }
-        catch (error) {
-            console.warn(error);
-        }
+        userResponse = await helperService.logScrappingResults(scrappingResults);
     }
     catch (error) {
         console.warn(`Error has occured: ${error.message}`);
     }
     finally {
         console.log(chalk.green('Job scrapping finished'));
-        console.log(chalk.green(userResponse));
+        if (userResponse && userResponse.startsWith('Error')) {
+            console.log(chalk.red(userResponse));
+        }
+        else {
+            console.log(chalk.green(userResponse));
+        }
         if (browser)
             await browser.close();
+        console.timeEnd('Program Duration');
     }
 }
 (async () => {
+    const chalk = (await import('chalk')).default;
+    console.time('Program Duration');
+    console.log(chalk.green('Scrapping initiated.'));
     // Führt die Job-Scrape-Funktion aus und zeigt die Ergebnisse an
-    await scrapeJobs(config_1.jobSuchKonfiguration);
+    await scrapeJobs(jobSuchKonfiguration, chalk);
 })();

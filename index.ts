@@ -2,20 +2,18 @@ import puppeteer from "puppeteer";
 import { jobSuchKonfiguration } from "./config/config";
 import dotenv from "dotenv";
 import helperService from "./services/helperService";
-import type { Job, JobSuchKonfiguration } from "./types/types";
+import type { JobSuchKonfiguration } from "./types/types";
 import type { Page } from "puppeteer";
 
 dotenv.config();
-
 /**
  * Extrahiert Jobdaten von einer angegebenen URL.
  * @param config - Das Konfigurationsobjekt, das Suchkriterien und die URL enthält.
  * @returns Promise<Job[]> - Führt die Scrape-Aktion aus und gibt nichts zurück.
  */
-async function scrapeJobs(config: JobSuchKonfiguration): Promise<void> {
+async function scrapeJobs(config: JobSuchKonfiguration, chalk: any): Promise<void> {
   let browser; // intiate browser instance
   let userResponse;
-  const chalk = (await import('chalk')).default;
   try {
     browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
@@ -60,7 +58,7 @@ async function scrapeJobs(config: JobSuchKonfiguration): Promise<void> {
     await page.type("#wo-input", ort);
     await page.click("#btn-stellen-finden");
 
-    await page.waitForSelector("#ergebnis-container", { timeout: 10000 });
+    await page.waitForSelector("#ergebnis-container", { timeout: 800 });
 
     await page.click("#filter-toggle");
 
@@ -167,10 +165,14 @@ async function scrapeJobs(config: JobSuchKonfiguration): Promise<void> {
       console.log(chalk.green(userResponse));
     }
     if (browser) await browser.close();
+    console.timeEnd('Program Duration');
   }
 }
 
 (async () => {
+  const chalk = (await import('chalk')).default;
+  console.time('Program Duration');
+  console.log(chalk.green('Scrapping initiated.'));
   // Führt die Job-Scrape-Funktion aus und zeigt die Ergebnisse an
-  await scrapeJobs(jobSuchKonfiguration);
+  await scrapeJobs(jobSuchKonfiguration, chalk);
 })();

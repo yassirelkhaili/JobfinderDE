@@ -1,10 +1,7 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.jobSuchKonfiguration = void 0;
 /**
 * Konfigurationsobjekt für die Jobsuche auf der Bundesagentur für Arbeit Webseite.
 */
-exports.jobSuchKonfiguration = {
+export const jobSuchKonfiguration = {
     /**
     * Die URL der Bundesagentur für Arbeit Jobbörse.
     */
