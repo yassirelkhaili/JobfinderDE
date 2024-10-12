@@ -8,7 +8,9 @@
     "rerun": "npm run clean && npm run start",
     "dev": "tsc --watch",
     "clean": "rm -rf dist",
-    "dump": "rm -rf dump"
+    "dump": "rm -rf dump",
+    "logs": "rm -rf logs",
+    "dump-all": "npm run logs && npm run dump"
   },
   "keywords": [],
   "author": "",

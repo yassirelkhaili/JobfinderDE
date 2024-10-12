@@ -1,6 +1,6 @@
 import { mkdir, writeFile } from 'fs/promises';
 import { join } from 'path';
-import type { JobSuchKonfiguration } from "../types/types";
+import type { JobSuchKonfiguration, Jobanzeige } from "../types/types";
 
 class HelperService {
     /**
@@ -52,7 +52,7 @@ class HelperService {
         return parsedBezeichnungen;
     }
 
-    public async logScrappingResults(scrappingResults: string[]): Promise<string> {
+    public async logScrappingResults(scrappingResults: Jobanzeige[]): Promise<string> {
         let response: string = '';
         try {
           const now = new Date();
@@ -61,7 +61,16 @@ class HelperService {
           const timestamp = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')}-${String(now.getSeconds()).padStart(2, '0')}`;
           const fileName = `${timestamp}.log`;
           const filePath = join(folderPath, fileName);
-          const logEntries = scrappingResults.map((result, index) => `${timestamp} - Job ad ${index + 1}: ${result}\n`).join('');
+          const logEntries = scrappingResults.map((result, index) => 
+            `Job Ad ${index + 1}:
+            - Bezeichnung: ${result.bezeichnung}
+            - Firma: ${result.firma}
+            - Ort: ${result.ort}
+            - Befristung: ${result.befristung}
+            - Datum seit: ${result.datumseit}
+            - Beschreibung: ${result.beschreibung}
+            `
+          ).join('\n');
           await writeFile(filePath, logEntries);
           response = `Scraping results written to ${filePath}`;
         } catch (error) {

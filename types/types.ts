@@ -25,9 +25,8 @@ export interface JobSuchKonfiguration {
 
 export interface Jobanzeige {
   bezeichnung: string,
-  unternehmen: string,
+  firma: string,
   ort: string,
-  veroeffentlichtseit: string,
   befristung: string,
   datumseit: string,
   beschreibung: string

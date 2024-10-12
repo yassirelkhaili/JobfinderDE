@@ -1,8 +1,13 @@
-import puppeteer from "puppeteer";
-import { jobSuchKonfiguration } from "./config/config.js";
-import dotenv from "dotenv";
-import helperService from "./services/helperService.js";
-dotenv.config();
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const puppeteer_1 = __importDefault(require("puppeteer"));
+const config_1 = require("./config/config");
+const dotenv_1 = __importDefault(require("dotenv"));
+const helperService_1 = __importDefault(require("./services/helperService"));
+dotenv_1.default.config();
 /**
  * Extrahiert Jobdaten von einer angegebenen URL.
  * @param config - Das Konfigurationsobjekt, das Suchkriterien und die URL enthält.
@@ -12,7 +17,7 @@ async function scrapeJobs(config, chalk) {
     let browser; // intiate browser instance
     let userResponse;
     try {
-        browser = await puppeteer.launch({ headless: false });
+        browser = await puppeteer_1.default.launch({ headless: true });
         const page = await browser.newPage();
         // Öffnet die URL und wartet, bis die Seite vollständig geladen ist
         await page.goto(config.url, { waitUntil: "networkidle2" });
@@ -20,7 +25,7 @@ async function scrapeJobs(config, chalk) {
         await page.deleteCookie(...cookies);
         await page.reload();
         // Parse the values for arbeitsBezeichnungen and ort
-        const arbeitsBezeichnungen = helperService.parseArbeitsBezeichnungen(config["arbeitsBezeichnungen"]);
+        const arbeitsBezeichnungen = helperService_1.default.parseArbeitsBezeichnungen(config["arbeitsBezeichnungen"]);
         const ort = config["ort"];
         // Führt die Evaluierungsfunktion auf der Seite aus
         /**
@@ -48,7 +53,7 @@ async function scrapeJobs(config, chalk) {
         await page.waitForSelector("#ergebnis-container", { timeout: 800 });
         await page.click("#filter-toggle");
         await new Promise((resolve) => setTimeout(resolve, 1000));
-        const jobSuchKonfigurationsArray = Object.entries(jobSuchKonfiguration);
+        const jobSuchKonfigurationsArray = Object.entries(config_1.jobSuchKonfiguration);
         for (const [key] of jobSuchKonfigurationsArray.slice(3)) {
             try {
                 const dropDownButtonSelector = `button[id="${key}-accordion-heading-link"]`;
@@ -62,7 +67,7 @@ async function scrapeJobs(config, chalk) {
         }
         await new Promise((resolve) => setTimeout(resolve, 1000));
         for (const [key, value] of jobSuchKonfigurationsArray.slice(3)) {
-            const bezeichnungen = helperService.parseInputIdSelector(value);
+            const bezeichnungen = helperService_1.default.parseInputIdSelector(value);
             if (bezeichnungen && Array.isArray(bezeichnungen)) {
                 for (const bezeichnung of bezeichnungen) {
                     try {
@@ -99,7 +104,25 @@ async function scrapeJobs(config, chalk) {
                         await new Promise((resolve) => setTimeout(resolve, 500));
                         const offerDescriptionContainer = await page.waitForSelector(`#detail-beschreibung-beschreibung`, { timeout: 1000 });
                         const descriptionText = offerDescriptionContainer && await offerDescriptionContainer.evaluate(el => el.innerText);
-                        descriptionText && jobOffers.push(descriptionText);
+                        const offerTitleContainer = await page.$('#detail-kopfbereich-titel');
+                        const offerTitle = offerTitleContainer && await offerTitleContainer.evaluate(el => el.innerText);
+                        const offerCompanyContainer = await page.$('#detail-kopfbereich-firma');
+                        const offerCompany = offerCompanyContainer && await offerCompanyContainer.evaluate(el => el.innerText);
+                        const ortContainer = await page.$('#detail-kopfbereich-arbeitsort');
+                        const ort = ortContainer && await ortContainer.evaluate(el => el.innerText);
+                        const befristungContainer = await page.$('#detail-kopfbereich-befristung');
+                        const befristung = befristungContainer && await befristungContainer.evaluate(el => el.innerText);
+                        const datumseitContainer = await page.$('#detail-kopfbereich-veroeffentlichungsdatum');
+                        const datumseit = datumseitContainer && await datumseitContainer.evaluate(el => el.innerText);
+                        const jobAnzeige = {
+                            bezeichnung: offerTitle ?? '',
+                            firma: offerCompany ?? '',
+                            ort: ort ?? '',
+                            befristung: befristung ?? '',
+                            datumseit: datumseit ?? '',
+                            beschreibung: descriptionText ?? ''
+                        };
+                        descriptionText && jobOffers.push(jobAnzeige);
                         const exitButton = await page.$('#close-modales-slide-in-detailansicht');
                         if (exitButton) {
                             exitButton.click();
@@ -124,7 +147,7 @@ async function scrapeJobs(config, chalk) {
             return jobOffers;
         };
         const scrappingResults = await scrapeJobs();
-        userResponse = await helperService.logScrappingResults(scrappingResults);
+        userResponse = await helperService_1.default.logScrappingResults(scrappingResults);
     }
     catch (error) {
         console.warn(`Error has occured: ${error.message}`);
@@ -139,7 +162,6 @@ async function scrapeJobs(config, chalk) {
         }
         if (browser)
             await browser.close();
-        console.timeEnd('Program Duration');
     }
 }
 (async () => {
@@ -147,5 +169,6 @@ async function scrapeJobs(config, chalk) {
     console.time('Program Duration');
     console.log(chalk.green('Scrapping initiated.'));
     // Führt die Job-Scrape-Funktion aus und zeigt die Ergebnisse an
-    await scrapeJobs(jobSuchKonfiguration, chalk);
+    await scrapeJobs(config_1.jobSuchKonfiguration, chalk);
+    console.timeEnd('Program Duration');
 })();

@@ -15,7 +15,7 @@ async function scrapeJobs(config: JobSuchKonfiguration, chalk: any): Promise<voi
   let browser; // intiate browser instance
   let userResponse;
   try {
-    browser = await puppeteer.launch({ headless: false });
+    browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
 
     // Öffnet die URL und wartet, bis die Seite vollständig geladen ist
@@ -122,8 +122,8 @@ async function scrapeJobs(config: JobSuchKonfiguration, chalk: any): Promise<voi
 
     const offerNavigationElements = await page.$$('.ergebnisliste-item');
 
-    const scrapeJobs = async (): Promise<string[]> => {
-      let jobOffers: string[] = [];
+    const scrapeJobs = async (): Promise<Jobanzeige[]> => {
+      let jobOffers: Jobanzeige[] = [];
       if (offerNavigationElements) {
         for (const jobOfferNavigationLink of offerNavigationElements) {
           try {
@@ -131,7 +131,25 @@ async function scrapeJobs(config: JobSuchKonfiguration, chalk: any): Promise<voi
             await new Promise((resolve: (value?: unknown) => void) => setTimeout(resolve, 500));
             const offerDescriptionContainer = await page.waitForSelector(`#detail-beschreibung-beschreibung`, { timeout: 1000 });
             const descriptionText = offerDescriptionContainer && await offerDescriptionContainer.evaluate(el => (el as HTMLElement).innerText);
-            descriptionText && jobOffers.push(descriptionText);
+            const offerTitleContainer = await page.$('#detail-kopfbereich-titel');
+            const offerTitle = offerTitleContainer && await offerTitleContainer.evaluate(el => (el as HTMLElement).innerText);
+            const offerCompanyContainer = await page.$('#detail-kopfbereich-firma');
+            const offerCompany = offerCompanyContainer && await offerCompanyContainer.evaluate(el => (el as HTMLElement).innerText);
+            const ortContainer = await page.$('#detail-kopfbereich-arbeitsort');
+            const ort = ortContainer && await ortContainer.evaluate(el => (el as HTMLElement).innerText);
+            const befristungContainer = await page.$('#detail-kopfbereich-befristung');
+            const befristung = befristungContainer && await befristungContainer.evaluate(el => (el as HTMLElement).innerText);
+            const datumseitContainer = await page.$('#detail-kopfbereich-veroeffentlichungsdatum');
+            const datumseit = datumseitContainer && await datumseitContainer.evaluate(el => (el as HTMLElement).innerText);
+            const jobAnzeige: Jobanzeige = {
+              bezeichnung: offerTitle ?? '',
+              firma: offerCompany ?? '',
+              ort: ort ?? '',
+              befristung: befristung ?? '',
+              datumseit: datumseit ?? '',
+              beschreibung: descriptionText ?? ''
+            };
+            descriptionText && jobOffers.push(jobAnzeige);
             const exitButton = await page.$('#close-modales-slide-in-detailansicht');
             if (exitButton) {
               exitButton.click();
