@@ -132,14 +132,21 @@ async function scrapeJobs(config: JobSuchKonfiguration): Promise<void> {
             await jobOfferNavigationLink.click();
             await new Promise((resolve: (value?: unknown) => void) => setTimeout(resolve, 500));
             const offerDescriptionContainer = await page.waitForSelector(`#detail-beschreibung-beschreibung`, { timeout: 1000 });
-            if (offerDescriptionContainer) {
-              const descriptionText = await offerDescriptionContainer.evaluate(el => (el as HTMLElement).innerText);
-              jobOffers.push(descriptionText);
-            } else {
-              console.warn('Error has occured: job offer scrapping not successful');
+            const descriptionText = offerDescriptionContainer && await offerDescriptionContainer.evaluate(el => (el as HTMLElement).innerText);
+            descriptionText && jobOffers.push(descriptionText);
+            const exitButton = await page.$('#close-modales-slide-in-detailansicht');
+            if (exitButton) {
+              exitButton.click();
+              await new Promise((resolve: (value?: unknown) => void) => setTimeout(resolve, 500));
             }
           } catch (error: any) {
-            console.warn(`Error has occured: ${error.message}`);
+            const exitButton = await page.$('#close-modales-slide-in-detailansicht');
+            if (exitButton) {
+              exitButton.click();
+              await new Promise((resolve: (value?: unknown) => void) => setTimeout(resolve, 500));
+            } else {
+              console.warn(`Error has occured: ${error.message}`);
+            }
           }
         }
       } else {
@@ -149,16 +156,16 @@ async function scrapeJobs(config: JobSuchKonfiguration): Promise<void> {
     }
 
     const scrappingResults = await scrapeJobs();
-    try {
-      userResponse = await helperService.logScrappingResults(scrappingResults);
-    } catch (error) {
-      console.warn(error);
-    }
+    userResponse = await helperService.logScrappingResults(scrappingResults);
   } catch (error: any) {
     console.warn(`Error has occured: ${error.message}`);
   } finally {
     console.log(chalk.green('Job scrapping finished'));
-    console.log(chalk.green(userResponse));
+    if (userResponse && userResponse.startsWith('Error')) {
+      console.log(chalk.red(userResponse));
+    } else {
+      console.log(chalk.green(userResponse));
+    }
     if (browser) await browser.close();
   }
 }

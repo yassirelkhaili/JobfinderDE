@@ -64,10 +64,10 @@ class HelperService {
           const logEntries = scrappingResults.map((result, index) => `${timestamp} - Job Offer ${index + 1}: ${result}\n`).join('');
           await writeFile(filePath, logEntries);
           response = `Scraping results written to ${filePath}`;
-          return response;
         } catch (error) {
-          throw new Error(`Error writing to log file: ${error}`);
+          response = `Error writing to log file: ${error}`;
         }
+        return response;
       }
       
 }

@@ -103,17 +103,24 @@ async function scrapeJobs(config) {
                     try {
                         await jobOfferNavigationLink.click();
                         await new Promise((resolve) => setTimeout(resolve, 500));
-                        const offerDescriptionContainer = await page.waitForSelector(`#detail-beschreibung-beschreibung`, { timeout: 5000 });
-                        if (offerDescriptionContainer) {
-                            const descriptionText = await offerDescriptionContainer.evaluate(el => el.innerText);
-                            jobOffers.push(descriptionText);
-                        }
-                        else {
-                            console.warn('Error has occured: job offer scrapping not successful');
+                        const offerDescriptionContainer = await page.waitForSelector(`#detail-beschreibung-beschreibung`, { timeout: 1000 });
+                        const descriptionText = offerDescriptionContainer && await offerDescriptionContainer.evaluate(el => el.innerText);
+                        descriptionText && jobOffers.push(descriptionText);
+                        const exitButton = await page.$('#close-modales-slide-in-detailansicht');
+                        if (exitButton) {
+                            exitButton.click();
+                            await new Promise((resolve) => setTimeout(resolve, 500));
                         }
                     }
                     catch (error) {
-                        console.warn(`Error has occured: ${error.message}`);
+                        const exitButton = await page.$('#close-modales-slide-in-detailansicht');
+                        if (exitButton) {
+                            exitButton.click();
+                            await new Promise((resolve) => setTimeout(resolve, 500));
+                        }
+                        else {
+                            console.warn(`Error has occured: ${error.message}`);
+                        }
                     }
                 }
             }
@@ -124,7 +131,7 @@ async function scrapeJobs(config) {
         };
         const scrappingResults = await scrapeJobs();
         try {
-            userResponse = helperService_1.default.logScrappingResults(scrappingResults);
+            userResponse = await helperService_1.default.logScrappingResults(scrappingResults);
         }
         catch (error) {
             console.warn(error);
