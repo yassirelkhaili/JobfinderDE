@@ -5,8 +5,10 @@
   "scripts": {
     "build": "tsc",
     "start": "npm run build && node dist/index.js",
+    "rerun": "npm run clean && npm run start",
     "dev": "tsc --watch",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "dump": "rm -rf dump"
   },
   "keywords": [],
   "author": "",

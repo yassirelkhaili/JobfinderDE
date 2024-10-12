@@ -15,53 +15,60 @@ exports.jobSuchKonfiguration = {
      */
     arbeitsBezeichnungen: [
         'Fachinformatiker/in Anwendungsentwicklung',
-        'Webentwickler',
-        'Webentwickler Backend',
-        'Full-Stack Web-Entwickler/in'
+        // 'Webentwickler', 
+        // 'Webentwickler Backend', 
+        // 'Full-Stack Web-Entwickler/in'
     ],
     /**
+     * optional
      * ort: Ort oder Region, in der nach Arbeitsplätzen gesucht werden soll.
      * Beispiele: Stadt, PLZ, Bundesland, Land
      */
     ort: 'Deutschland (Land)',
     /**
+     * optional
      * arbeitsZeit: Arbeitszeitoptionen für die Suche.
-     * Mögliche Werte: 'Vollzeit', 'Teilzeit', 'Homeoffice', 'Alle'
+     * Mögliche Werte: 'Vollzeit', 'Teilzeit', 'Homeoffice', 'Alle anzeigen'
      */
-    arbeitsZeit: ['Vollzeit'],
+    // arbeitszeit: ['Vollzeit'],
     /**
+     * optional
      * befristung: Art des Arbeitsvertrags.
-     * Mögliche Werte: 'Befristet', 'Unbefristet', 'Alle'
+     * Mögliche Werte: 'Befristet', 'Unbefristet', 'Alle anzeigen'
      */
-    befristung: ['Unbefristet'],
+    // befristung: ['Unbefristet'],
     /**
+     * optional
      * veröffentlichkeit: Zeitrahmen, in dem die Stellenanzeigen veröffentlicht wurden.
-     * Mögliche Werte: 'Heute', 'Gestern', '1 Woche', '2 Wochen', '4 Wochen', 'Alle'
+     * Mögliche Werte: 'Heute', 'Gestern', '1 Woche', '2 Wochen', '4 Wochen', 'Alle anzeigen'
      */
-    veröffentlichkeit: ['Alle'],
+    // veroeffentlichtseit: ['Gestern'],
     /**
+     * optional
      * berufsfeld: Übergeordnete Berufsfelder, in denen gesucht wird.
      * Beispiele finden Sie auf der Seite der Bundesagentur für Arbeit.
      */
-    berufsfeld: [
-        'Softwareentwicklung und Programmierung',
-        'Informatik'
-    ],
+    // berufsfeld: [
+    // 'Softwareentwicklung und Programmierung', 
+    // 'Informatik'
+    // ],
     /**
+     * optional
      * beruf: Spezifische Berufe, nach denen gesucht wird.
      * Beispiele finden Sie auf der Seite der Bundesagentur für Arbeit.
      */
-    beruf: [
-        'Softwareentwickler/in',
-        'Web Developer',
-        'Fachinformatiker/in - Anwendungsentwicklung'
-    ],
+    // beruf: [
+    // 'Softwareentwickler/in', 
+    // 'Web Developer', 
+    // 'Fachinformatiker/in - Anwendungsentwicklung'
+    // ],
     /**
+    * optional
     * Branche, in der nach Arbeitsplätzen gesucht wird.
     * Beispiele: IT-Computer-Telekommunikation
     * Siehe die Seite der Bundesagentur für Arbeit für mögliche Branchen.
     */
-    branche: [
-        'IT-Computer-Telekommunikation'
-    ]
+    //  branche: [
+    // 'IT-Computer-Telekommunikation'
+    // ]
 };
