@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const puppeteer_1 = __importDefault(require("puppeteer"));
 const config_1 = require("./config/config");
 const dotenv_1 = __importDefault(require("dotenv"));
+const prompt_1 = require("./config/prompt");
 const helperService_1 = __importDefault(require("./services/helperService"));
 dotenv_1.default.config();
 /**
@@ -16,6 +17,7 @@ dotenv_1.default.config();
 async function scrapeJobs(config, chalk) {
     let browser; // intiate browser instance
     let userResponse;
+    let numJobAds = 0;
     try {
         browser = await puppeteer_1.default.launch({ headless: true });
         const page = await browser.newPage();
@@ -128,6 +130,7 @@ async function scrapeJobs(config, chalk) {
                             beschreibung: descriptionText ?? ''
                         };
                         descriptionText && jobOffers.push(jobAnzeige);
+                        numJobAds++;
                         const exitButton = await page.$('#close-modales-slide-in-detailansicht');
                         if (exitButton) {
                             exitButton.click();
@@ -153,13 +156,30 @@ async function scrapeJobs(config, chalk) {
         };
         const scrappingResults = await scrapeJobs();
         console.log(chalk.green("Logging scrapping resutls..."));
-        userResponse = await helperService_1.default.logScrappingResults(scrappingResults);
+        const logEntries = scrappingResults.map((result, index) => `Job Ad ${index + 1}:
+      - Bezeichnung: ${result.bezeichnung}
+      - Firma: ${result.firma}
+      - Ort: ${result.ort}
+      - Befristung: ${result.befristung}
+      - Datum seit: ${result.datumseit}
+      - Beschreibung: ${result.beschreibung}
+      `).join('\n');
+        userResponse = await helperService_1.default.logScrappingResults(logEntries);
+        console.log(chalk.green("Waiting for AI response..."));
+        let finalResults = '';
+        try {
+            finalResults = await helperService_1.default.getOpenAIResponse(helperService_1.default.prepareAIPrompt(prompt_1.jobCategorizationPrompt, prompt_1.userProfile, logEntries), process.env.OPENAI_ORG ?? '', process.env.OPENAI_PROJECT ?? '');
+        }
+        catch (error) {
+            console.log(chalk.red(error));
+        }
+        helperService_1.default.logOpenAIResults(finalResults);
     }
     catch (error) {
         console.log(chalk.red(`Error has occured: ${error.message}`));
     }
     finally {
-        console.log(chalk.green('Job scrapping finished'));
+        console.log(chalk.green('Job scrapping finished.'));
         if (userResponse && userResponse.startsWith('Error')) {
             console.log(chalk.red(userResponse));
         }
@@ -168,6 +188,7 @@ async function scrapeJobs(config, chalk) {
         }
         if (browser)
             await browser.close();
+        return numJobAds;
     }
 }
 (async () => {
@@ -175,6 +196,7 @@ async function scrapeJobs(config, chalk) {
     console.time('Program Duration');
     console.log(chalk.green('Scrapping initiated.'));
     // Führt die Job-Scrape-Funktion aus und zeigt die Ergebnisse an
-    await scrapeJobs(config_1.jobSuchKonfiguration, chalk);
+    const numJobAds = await scrapeJobs(config_1.jobSuchKonfiguration, chalk);
+    console.log(chalk.green("Jobs ads processed: " + numJobAds));
     console.timeEnd('Program Duration');
 })();

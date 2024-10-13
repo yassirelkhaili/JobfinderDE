@@ -195,7 +195,7 @@ async function scrapeJobs(config: JobSuchKonfiguration, chalk: any): Promise<num
     console.log(chalk.green("Waiting for AI response..."));
     let finalResults = '';
     try {
-      finalResults = await helperService.getOpenAIResponse(helperService.prepareAIPrompt(jobCategorizationPrompt, userProfile, logEntries), process.env.OPENAI_ORG ?? '', process.env.OPENAI_PROJECT ?? '');
+      finalResults = await helperService.getOpenAIResponse(helperService.prepareAIPrompt(jobCategorizationPrompt, userProfile, logEntries), process.env.OPENAI_BASE_URL ?? '', process.env.OPENAI_API_KEY ?? '');
     } catch (error) {
       console.log(chalk.red(error));
     }

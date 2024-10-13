@@ -73,14 +73,14 @@ class HelperService {
       public prepareAIPrompt = (prompt: string, userProfile: string, jobAds: string): string => prompt.replace('__USERPROFILE_PLACEHOLDER__', userProfile).replace('__JOBADS_PLACEHOLDER__', jobAds);
 
       /**
-      * @param {string} orgID organisationID
-      * @param {string} projId projectID
+      * @param {string} baseURL openai base url
+      * @param {string} apiKey open ai key
       */
-      public async getOpenAIResponse(prompt: string, orgID: string, projId: string): Promise<string> {
+      public async getOpenAIResponse(prompt: string, baseURL: string, apiKey: string): Promise<string> {
         try {
           const openai = new OpenAI({
-            organization: orgID,
-            project: projId,
+            apiKey: apiKey,
+            baseURL: baseURL,
         });
       
           const response = await openai.chat.completions.create({
