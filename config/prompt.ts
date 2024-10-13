@@ -1,5 +1,5 @@
 export const jobCategorizationPrompt: string = `
-You are an assistant categorizing job ads for a user based on their personal preferences. Rank the following job ad from "Great" to "Bad" based on these criteria:
+You are an assistant categorizing job ads for a user based on their personal preferences. Rank the following job ads from "Great" to "Bad" based on these criteria:
 
 - **Job simplicity and requirements**: Jobs with fewer requirements and lower difficulty are preferred.
 - **Technologies required**: Jobs that closely match the user’s technology skills are prioritized.
@@ -8,17 +8,68 @@ You are an assistant categorizing job ads for a user based on their personal pre
 - **Individual user profile**: Tailor the ranking to the user’s personal profile (experience, skills, desired job type).
 - **Distance to job location**: Prefer closer locations to reduce commute time.
 
-**Job Ad Details**: __JOBADS_PLACEHOLDER__
+**Job Ads Details**:
+__JOBADS_PLACEHOLDER__
 
-**User Profile**: __USERPROFILE_PLACEHOLDER__
+**User Profile**:
+__USERPROFILE_PLACEHOLDER__
 
-**Categorization**: Based on the above details, rank this job ad as one of the following:
-1. Great
-2. Good
-3. Average
-4. Bad
+**Categorization**:
+Based on the above details, categorize each job ad as one of the following:
+1. **Great**
+2. **Good**
+3. **Average**
+4. **Bad**
 
-Please explain the rationale for your categorization in 2-3 sentences, considering the ease of the job, the technology match, the contract type, and the posting recency.
+Please provide the response in markdown format with the following structure:
+
+### Great
+For job ads rated as "Great," list the details and a short explanation as follows:
+- **Bezeichnung**: [Job Title]
+- **Firma**: [Company]
+- **Ort**: [Location]
+- **Befristung**: [Contract Type]
+- **Datum seit**: [Posted Date]
+- **Link**: [Job Posting](<insert link here>)
+
+*Explanation*: Describe why this job ad is categorized as "Great," considering the job’s ease, technology match, contract type, and posting recency.
+
+### Good
+For job ads rated as "Good," list the details and a short explanation as follows:
+- **Bezeichnung**: [Job Title]
+- **Firma**: [Company]
+- **Ort**: [Location]
+- **Befristung**: [Contract Type]
+- **Datum seit**: [Posted Date]
+- **Link**: [Job Posting](<insert link here>)
+
+*Explanation*: Describe why this job ad is categorized as "Good," considering the job’s ease, technology match, contract type, and posting recency.
+
+### Average
+For job ads rated as "Average," list the details and a short explanation as follows:
+- **Bezeichnung**: [Job Title]
+- **Firma**: [Company]
+- **Ort**: [Location]
+- **Befristung**: [Contract Type]
+- **Datum seit**: [Posted Date]
+- **Link**: [Job Posting](<insert link here>)
+
+*Explanation*: Describe why this job ad is categorized as "Average," considering the job’s ease, technology match, contract type, and posting recency.
+
+### Bad
+For job ads rated as "Bad," list the details and a short explanation as follows:
+- **Bezeichnung**: [Job Title]
+- **Firma**: [Company]
+- **Ort**: [Location]
+- **Befristung**: [Contract Type]
+- **Datum seit**: [Posted Date]
+- **Link**: [Job Posting](<insert link here>)
+
+*Explanation*: Describe why this job ad is categorized as "Bad," considering the job’s ease, technology match, contract type, and posting recency.
+
+---
+
+Please ensure all content is formatted in markdown.
 `;
 
 export const userProfile: string = `

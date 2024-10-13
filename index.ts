@@ -154,7 +154,8 @@ async function scrapeJobs(config: JobSuchKonfiguration, chalk: any): Promise<num
               ort: ort ?? '',
               befristung: befristung ?? '',
               datumseit: datumseit ?? '',
-              beschreibung: descriptionText ?? ''
+              beschreibung: descriptionText ?? '',
+              link: window.location.href
             };
             descriptionText && jobOffers.push(jobAnzeige);
             numJobAds++;
@@ -188,6 +189,7 @@ async function scrapeJobs(config: JobSuchKonfiguration, chalk: any): Promise<num
       - Ort: ${result.ort}
       - Befristung: ${result.befristung}
       - Datum seit: ${result.datumseit}
+      - Link: ${result.link}
       - Beschreibung: ${result.beschreibung}
       `
     ).join('\n');
@@ -199,7 +201,7 @@ async function scrapeJobs(config: JobSuchKonfiguration, chalk: any): Promise<num
     } catch (error) {
       console.log(chalk.red(error));
     }
-      userResponses.push(await helperService.logOpenAIResults(finalResults));
+      if (finalResults !== '') userResponses.push(await helperService.logOpenAIResults(finalResults));
   } catch (error: any) {
     console.log(chalk.red(`Error has occured: ${error.message}`));
   } finally {

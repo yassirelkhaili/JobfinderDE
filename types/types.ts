@@ -29,5 +29,6 @@ export interface Jobanzeige {
   ort: string,
   befristung: string,
   datumseit: string,
-  beschreibung: string
+  beschreibung: string,
+  link: string
 }

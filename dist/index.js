@@ -127,7 +127,8 @@ async function scrapeJobs(config, chalk) {
                             ort: ort ?? '',
                             befristung: befristung ?? '',
                             datumseit: datumseit ?? '',
-                            beschreibung: descriptionText ?? ''
+                            beschreibung: descriptionText ?? '',
+                            link: window.location.href
                         };
                         descriptionText && jobOffers.push(jobAnzeige);
                         numJobAds++;
@@ -162,6 +163,7 @@ async function scrapeJobs(config, chalk) {
       - Ort: ${result.ort}
       - Befristung: ${result.befristung}
       - Datum seit: ${result.datumseit}
+      - Link: ${result.link}
       - Beschreibung: ${result.beschreibung}
       `).join('\n');
         userResponses.push(await helperService_1.default.logScrappingResults(logEntries));
@@ -173,7 +175,8 @@ async function scrapeJobs(config, chalk) {
         catch (error) {
             console.log(chalk.red(error));
         }
-        userResponses.push(await helperService_1.default.logOpenAIResults(finalResults));
+        if (finalResults !== '')
+            userResponses.push(await helperService_1.default.logOpenAIResults(finalResults));
     }
     catch (error) {
         console.log(chalk.red(`Error has occured: ${error.message}`));
