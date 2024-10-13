@@ -81,12 +81,13 @@ class HelperService {
           const openai = new OpenAI({
             apiKey: apiKey,
         });
-      
           const response = await openai.chat.completions.create({
-            model: "gpt-4o-mini",
-            messages: [{ role: "user", content: prompt }],
-          });
-      
+            model: "gpt-4o", // if you want to change the modal visit openai's usage pricing shart for more info
+            messages: [
+                { role: "system", content: "You are a helpful assistant." },
+                { role: "user", content: prompt }
+            ],
+        });
           if (response.choices && response.choices.length > 0) {
             return response.choices[0].message.content || "";
           } else {
