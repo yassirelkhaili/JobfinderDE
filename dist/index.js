@@ -32,6 +32,7 @@ async function scrapeJobs(config, chalk) {
          * Sucht nach dem `bahf-cookie-disclaimer-dpl3`-Element, greift auf sein `shadowRoot` zu,
          * und klickt auf den Button `.ba-btn-contrast`, um die Cookie-Bestätigung abzuschließen, falls vorhanden.
          */
+        console.log(chalk.green("Skipping cookie prompt."));
         await page.evaluate(async () => {
             await new Promise((resolve) => setTimeout(resolve, 100));
             const rootElement = document.querySelector("bahf-cookie-disclaimer-dpl3");
@@ -47,12 +48,14 @@ async function scrapeJobs(config, chalk) {
          * Füllt das erste Eingabefeld mit der Arbeitsbezeichnung und das zweite mit dem Ort aus,
          * und klickt anschließend auf den Submit-Button.
          */
+        console.log(chalk.green("Filling up the search form."));
         await page.type("#was-input", arbeitsBezeichnungen);
         await page.type("#wo-input", ort);
         await page.click("#btn-stellen-finden");
         await page.waitForSelector("#ergebnis-container", { timeout: 800 });
         await page.click("#filter-toggle");
         await new Promise((resolve) => setTimeout(resolve, 1000));
+        console.log(chalk.green("Applying filters from config..."));
         const jobSuchKonfigurationsArray = Object.entries(config_1.jobSuchKonfiguration);
         for (const [key] of jobSuchKonfigurationsArray.slice(3)) {
             try {
@@ -62,7 +65,7 @@ async function scrapeJobs(config, chalk) {
                     await page.click(dropDownButtonSelector);
             }
             catch (error) {
-                console.warn(`Error has occurred: ${error.message}`);
+                console.log(chalk.red(`Error has occurred: ${error.message}`));
             }
         }
         await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -74,16 +77,17 @@ async function scrapeJobs(config, chalk) {
                         await page.click(`input[id="${key}-${bezeichnung}"]`);
                     }
                     catch (error) {
-                        console.warn(`Error has occured: ${error.message}`);
+                        console.log(chalk.red(`Error has occured: ${error.message}`));
                     }
                 }
             }
             else {
-                console.warn("Value parsing failed or value missing in config.");
+                console.log(chalk.yellow("Value parsing failed or value missing in config."));
             }
         }
         await page.click("#footer-button-modales-slide-in-filter");
         await new Promise((resolve) => setTimeout(resolve, 100));
+        console.log(chalk.green("Preparing data for scrapping..."));
         async function clickButtonUntilGone(page, iterations = 2) {
             const button = await page.$("#ergebnisliste-ladeweitere-button");
             if (button === null)
@@ -94,6 +98,7 @@ async function scrapeJobs(config, chalk) {
             await clickButtonUntilGone(page, ++iterations);
         }
         await clickButtonUntilGone(page);
+        console.log(chalk.green("Scrapping job ads..."));
         const offerNavigationElements = await page.$$('.ergebnisliste-item');
         const scrapeJobs = async () => {
             let jobOffers = [];
@@ -136,21 +141,22 @@ async function scrapeJobs(config, chalk) {
                             await new Promise((resolve) => setTimeout(resolve, 500));
                         }
                         else {
-                            console.warn(`Error has occured: ${error.message}`);
+                            console.log(chalk.red(`Error has occured: ${error.message}`));
                         }
                     }
                 }
             }
             else {
-                console.warn('Error has occured: no job offers detected');
+                console.log(chalk.red('Error has occured: no job offers detected'));
             }
             return jobOffers;
         };
         const scrappingResults = await scrapeJobs();
+        console.log(chalk.green("Logging scrapping resutls..."));
         userResponse = await helperService_1.default.logScrappingResults(scrappingResults);
     }
     catch (error) {
-        console.warn(`Error has occured: ${error.message}`);
+        console.log(chalk.red(`Error has occured: ${error.message}`));
     }
     finally {
         console.log(chalk.green('Job scrapping finished'));

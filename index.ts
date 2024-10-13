@@ -36,6 +36,7 @@ async function scrapeJobs(config: JobSuchKonfiguration, chalk: any): Promise<voi
      * Sucht nach dem `bahf-cookie-disclaimer-dpl3`-Element, greift auf sein `shadowRoot` zu,
      * und klickt auf den Button `.ba-btn-contrast`, um die Cookie-Bestätigung abzuschließen, falls vorhanden.
      */
+    console.log(chalk.green("Skipping cookie prompt."));
     await page.evaluate(async () => {
       await new Promise((resolve) => setTimeout(resolve, 100));
       const rootElement = document.querySelector("bahf-cookie-disclaimer-dpl3");
@@ -54,6 +55,7 @@ async function scrapeJobs(config: JobSuchKonfiguration, chalk: any): Promise<voi
      * Füllt das erste Eingabefeld mit der Arbeitsbezeichnung und das zweite mit dem Ort aus,
      * und klickt anschließend auf den Submit-Button.
      */
+    console.log(chalk.green("Filling up the search form."));
     await page.type("#was-input", arbeitsBezeichnungen);
     await page.type("#wo-input", ort);
     await page.click("#btn-stellen-finden");
@@ -66,6 +68,7 @@ async function scrapeJobs(config: JobSuchKonfiguration, chalk: any): Promise<voi
       setTimeout(resolve, 1000)
     );
 
+    console.log(chalk.green("Applying filters from config..."));
     const jobSuchKonfigurationsArray = Object.entries(jobSuchKonfiguration) as [
       keyof JobSuchKonfiguration,
       JobSuchKonfiguration[keyof JobSuchKonfiguration]
@@ -80,7 +83,7 @@ async function scrapeJobs(config: JobSuchKonfiguration, chalk: any): Promise<voi
         );
         if (isCollapsed) await page.click(dropDownButtonSelector);
       } catch (error: any) {
-        console.warn(`Error has occurred: ${error.message}`);
+        console.log(chalk.red(`Error has occurred: ${error.message}`));
       }
     }
 
@@ -95,11 +98,11 @@ async function scrapeJobs(config: JobSuchKonfiguration, chalk: any): Promise<voi
           try {
             await page.click(`input[id="${key}-${bezeichnung}"]`);
           } catch (error: any) {
-            console.warn(`Error has occured: ${error.message}`);
+            console.log(chalk.red(`Error has occured: ${error.message}`));
           }
         }
       } else {
-        console.warn("Value parsing failed or value missing in config.");
+        console.log(chalk.yellow("Value parsing failed or value missing in config."));
       }
     }
 
@@ -109,6 +112,7 @@ async function scrapeJobs(config: JobSuchKonfiguration, chalk: any): Promise<voi
       setTimeout(resolve, 100)
     );
 
+    console.log(chalk.green("Preparing data for scrapping..."));
     async function clickButtonUntilGone(page: Page, iterations = 2) {
       const button = await page.$("#ergebnisliste-ladeweitere-button");
       if (button === null) return;
@@ -120,6 +124,7 @@ async function scrapeJobs(config: JobSuchKonfiguration, chalk: any): Promise<voi
 
     await clickButtonUntilGone(page);
 
+    console.log(chalk.green("Scrapping job ads..."));
     const offerNavigationElements = await page.$$('.ergebnisliste-item');
 
     const scrapeJobs = async (): Promise<Jobanzeige[]> => {
@@ -161,22 +166,23 @@ async function scrapeJobs(config: JobSuchKonfiguration, chalk: any): Promise<voi
               exitButton.click();
               await new Promise((resolve: (value?: unknown) => void) => setTimeout(resolve, 500));
             } else {
-              console.warn(`Error has occured: ${error.message}`);
+              console.log(chalk.red(`Error has occured: ${error.message}`));
             }
           }
         }
       } else {
-        console.warn('Error has occured: no job offers detected');
+        console.log(chalk.red('Error has occured: no job offers detected'));
       }
       return jobOffers;
     }
 
     const scrappingResults = await scrapeJobs();
+    console.log(chalk.green("Logging scrapping resutls..."));
     userResponse = await helperService.logScrappingResults(scrappingResults);
   } catch (error: any) {
-    console.warn(`Error has occured: ${error.message}`);
+    console.log(chalk.red(`Error has occured: ${error.message}`));
   } finally {
-    console.log(chalk.green('Job scrapping finished'));
+    console.log(chalk.green('Job scrapping finished.'));
     if (userResponse && userResponse.startsWith('Error')) {
       console.log(chalk.red(userResponse));
     } else {
