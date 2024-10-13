@@ -19,7 +19,7 @@ async function scrapeJobs(config, chalk) {
     let userResponses = [];
     let numJobAds = 0;
     try {
-        browser = await puppeteer_1.default.launch({ headless: 'shell' });
+        browser = await puppeteer_1.default.launch({ headless: "shell" });
         const page = await browser.newPage();
         // Öffnet die URL und wartet, bis die Seite vollständig geladen ist
         await page.goto(config.url, { waitUntil: "networkidle2" });
@@ -121,6 +121,7 @@ async function scrapeJobs(config, chalk) {
                         const befristung = befristungContainer && await befristungContainer.evaluate(el => el.innerText);
                         const datumseitContainer = await page.$('#detail-kopfbereich-veroeffentlichungsdatum');
                         const datumseit = datumseitContainer && await datumseitContainer.evaluate(el => el.innerText);
+                        const offerLink = page.url();
                         const jobAnzeige = {
                             bezeichnung: offerTitle ?? '',
                             firma: offerCompany ?? '',
@@ -128,7 +129,7 @@ async function scrapeJobs(config, chalk) {
                             befristung: befristung ?? '',
                             datumseit: datumseit ?? '',
                             beschreibung: descriptionText ?? '',
-                            link: window.location.href
+                            link: offerLink
                         };
                         descriptionText && jobOffers.push(jobAnzeige);
                         numJobAds++;
@@ -168,15 +169,20 @@ async function scrapeJobs(config, chalk) {
       `).join('\n');
         userResponses.push(await helperService_1.default.logScrappingResults(logEntries));
         console.log(chalk.green("Waiting for AI response..."));
-        let finalResults = '';
-        try {
-            finalResults = await helperService_1.default.getOpenAIResponse(helperService_1.default.prepareAIPrompt(prompt_1.jobCategorizationPrompt, prompt_1.userProfile, logEntries), process.env.OPENAI_API_KEY ?? '');
+        if (scrappingResults) {
+            let finalResults = '';
+            try {
+                finalResults = await helperService_1.default.getOpenAIResponse(helperService_1.default.prepareAIPrompt(prompt_1.jobCategorizationPrompt, prompt_1.userProfile, logEntries), process.env.OPENAI_API_KEY ?? '');
+            }
+            catch (error) {
+                console.log(chalk.red(error));
+            }
+            if (finalResults !== '')
+                userResponses.push(await helperService_1.default.logOpenAIResults(finalResults));
         }
-        catch (error) {
-            console.log(chalk.red(error));
+        else {
+            console.log(chalk.red("Scrapping was unsuccessful result: " + scrappingResults));
         }
-        if (finalResults !== '')
-            userResponses.push(await helperService_1.default.logOpenAIResults(finalResults));
     }
     catch (error) {
         console.log(chalk.red(`Error has occured: ${error.message}`));

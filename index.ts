@@ -17,7 +17,7 @@ async function scrapeJobs(config: JobSuchKonfiguration, chalk: any): Promise<num
   let userResponses: string[] = [];
   let numJobAds = 0;
   try {
-    browser = await puppeteer.launch({ headless: 'shell' });
+    browser = await puppeteer.launch({ headless: "shell" });
     const page = await browser.newPage();
 
     // Öffnet die URL und wartet, bis die Seite vollständig geladen ist
@@ -148,6 +148,7 @@ async function scrapeJobs(config: JobSuchKonfiguration, chalk: any): Promise<num
             const befristung = befristungContainer && await befristungContainer.evaluate(el => (el as HTMLElement).innerText);
             const datumseitContainer = await page.$('#detail-kopfbereich-veroeffentlichungsdatum');
             const datumseit = datumseitContainer && await datumseitContainer.evaluate(el => (el as HTMLElement).innerText);
+            const offerLink = page.url();
             const jobAnzeige: Jobanzeige = {
               bezeichnung: offerTitle ?? '',
               firma: offerCompany ?? '',
@@ -155,7 +156,7 @@ async function scrapeJobs(config: JobSuchKonfiguration, chalk: any): Promise<num
               befristung: befristung ?? '',
               datumseit: datumseit ?? '',
               beschreibung: descriptionText ?? '',
-              link: window.location.href
+              link: offerLink
             };
             descriptionText && jobOffers.push(jobAnzeige);
             numJobAds++;
@@ -195,13 +196,17 @@ async function scrapeJobs(config: JobSuchKonfiguration, chalk: any): Promise<num
     ).join('\n');
     userResponses.push(await helperService.logScrappingResults(logEntries));
     console.log(chalk.green("Waiting for AI response..."));
+    if (scrappingResults) {
     let finalResults = '';
     try {
-      finalResults = await helperService.getOpenAIResponse(helperService.prepareAIPrompt(jobCategorizationPrompt, userProfile, logEntries), process.env.OPENAI_API_KEY ?? '');
+      finalResults = await helperService.getOpenAIResponse(helperService.prepareAIPrompt(jobCategorizationPrompt, userProfile, logEntries), process.env.OPENAI_API_KEY ?? '', process.env.OPENAI_API_MODEL ?? '');
     } catch (error) {
       console.log(chalk.red(error));
     }
       if (finalResults !== '') userResponses.push(await helperService.logOpenAIResults(finalResults));
+    } else {
+      console.log(chalk.red("Scrapping was unsuccessful result: " + scrappingResults));
+    }
   } catch (error: any) {
     console.log(chalk.red(`Error has occured: ${error.message}`));
   } finally {
