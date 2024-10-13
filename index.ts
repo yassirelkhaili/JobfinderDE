@@ -1,6 +1,7 @@
 import puppeteer from "puppeteer";
 import { jobSuchKonfiguration } from "./config/config";
 import dotenv from "dotenv";
+import { jobCategorizationPrompt, userProfile } from "./config/prompt";
 import helperService from "./services/helperService";
 import type { JobSuchKonfiguration , Jobanzeige} from "./types/types";
 import type { Page } from "puppeteer";
@@ -11,9 +12,10 @@ dotenv.config();
  * @param config - Das Konfigurationsobjekt, das Suchkriterien und die URL enthält.
  * @returns Promise<Job[]> - Führt die Scrape-Aktion aus und gibt nichts zurück.
  */
-async function scrapeJobs(config: JobSuchKonfiguration, chalk: any): Promise<void> {
+async function scrapeJobs(config: JobSuchKonfiguration, chalk: any): Promise<number> {
   let browser; // intiate browser instance
   let userResponse;
+  let numJobAds = 0;
   try {
     browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
@@ -155,6 +157,7 @@ async function scrapeJobs(config: JobSuchKonfiguration, chalk: any): Promise<voi
               beschreibung: descriptionText ?? ''
             };
             descriptionText && jobOffers.push(jobAnzeige);
+            numJobAds++;
             const exitButton = await page.$('#close-modales-slide-in-detailansicht');
             if (exitButton) {
               exitButton.click();
@@ -178,7 +181,25 @@ async function scrapeJobs(config: JobSuchKonfiguration, chalk: any): Promise<voi
 
     const scrappingResults = await scrapeJobs();
     console.log(chalk.green("Logging scrapping resutls..."));
-    userResponse = await helperService.logScrappingResults(scrappingResults);
+    const logEntries = scrappingResults.map((result, index) => 
+      `Job Ad ${index + 1}:
+      - Bezeichnung: ${result.bezeichnung}
+      - Firma: ${result.firma}
+      - Ort: ${result.ort}
+      - Befristung: ${result.befristung}
+      - Datum seit: ${result.datumseit}
+      - Beschreibung: ${result.beschreibung}
+      `
+    ).join('\n');
+    userResponse = await helperService.logScrappingResults(logEntries);
+    console.log(chalk.green("Waiting for AI response..."));
+    let finalResults = '';
+    try {
+      finalResults = await helperService.getOpenAIResponse(helperService.prepareAIPrompt(jobCategorizationPrompt, userProfile, logEntries), process.env.OPENAI_ORG ?? '', process.env.OPENAI_PROJECT ?? '');
+    } catch (error) {
+      console.log(chalk.red(error));
+    }
+    helperService.logOpenAIResults(finalResults);
   } catch (error: any) {
     console.log(chalk.red(`Error has occured: ${error.message}`));
   } finally {
@@ -189,6 +210,7 @@ async function scrapeJobs(config: JobSuchKonfiguration, chalk: any): Promise<voi
       console.log(chalk.green(userResponse));
     }
     if (browser) await browser.close();
+    return numJobAds;
   }
 }
 
@@ -197,6 +219,7 @@ async function scrapeJobs(config: JobSuchKonfiguration, chalk: any): Promise<voi
   console.time('Program Duration');
   console.log(chalk.green('Scrapping initiated.'));
   // Führt die Job-Scrape-Funktion aus und zeigt die Ergebnisse an
-  await scrapeJobs(jobSuchKonfiguration, chalk);
+  const numJobAds = await scrapeJobs(jobSuchKonfiguration, chalk);
+  console.log(chalk.green("Jobs ads processed: " + numJobAds));
   console.timeEnd('Program Duration');
 })();

@@ -1,4 +1,5 @@
 import { mkdir, writeFile } from 'fs/promises';
+import OpenAI from 'openai';
 import { join } from 'path';
 import type { JobSuchKonfiguration, Jobanzeige } from "../types/types";
 
@@ -52,7 +53,7 @@ class HelperService {
         return parsedBezeichnungen;
     }
 
-    public async logScrappingResults(scrappingResults: Jobanzeige[]): Promise<string> {
+    public async logScrappingResults(logEntries: string): Promise<string> {
         let response: string = '';
         try {
           const now = new Date();
@@ -61,16 +62,6 @@ class HelperService {
           const timestamp = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')}-${String(now.getSeconds()).padStart(2, '0')}`;
           const fileName = `${timestamp}.log`;
           const filePath = join(folderPath, fileName);
-          const logEntries = scrappingResults.map((result, index) => 
-            `Job Ad ${index + 1}:
-            - Bezeichnung: ${result.bezeichnung}
-            - Firma: ${result.firma}
-            - Ort: ${result.ort}
-            - Befristung: ${result.befristung}
-            - Datum seit: ${result.datumseit}
-            - Beschreibung: ${result.beschreibung}
-            `
-          ).join('\n');
           await writeFile(filePath, logEntries);
           response = `Scraping results written to ${filePath}`;
         } catch (error) {
@@ -78,7 +69,49 @@ class HelperService {
         }
         return response;
       }
+
+      public prepareAIPrompt = (prompt: string, userProfile: string, jobAds: string): string => prompt.replace('__USERPROFILE_PLACEHOLDER__', userProfile).replace('__JOBADS_PLACEHOLDER__', jobAds);
+
+      public async getOpenAIResponse(prompt: string, orgID: string, projId: string): Promise<string> {
+        try {
+          const openai = new OpenAI({
+            organization: orgID,
+            project: projId,
+        });
       
+          const response = await openai.chat.completions.create({
+            model: "gpt-4o-mini",
+            messages: [{ role: "user", content: prompt }],
+          });
+      
+          if (response.choices && response.choices.length > 0) {
+            return response.choices[0].message.content || "";
+          } else {
+            throw new Error("No response from OpenAI API");
+          }
+        } catch (error) {
+          console.error("Error calling OpenAI API:", error);
+          throw error;
+        }
+      }
+
+      // customizing previous log results method to adds complexity so decided to change it and repaste it here
+      public async logOpenAIResults(aiResponse: string): Promise<string> {
+        let response: string = '';
+        try {
+          const now = new Date();
+          const folderPath = './dump';
+          await mkdir(folderPath, { recursive: true });
+          const timestamp = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}-${String(now.getMinutes()).padStart(2, '0')}-${String(now.getSeconds()).padStart(2, '0')}`;
+          const fileName = `${timestamp}.txt`;
+          const filePath = join(folderPath, fileName);
+          await writeFile(filePath, aiResponse);
+          response = `Final Result written to ${filePath}`;
+        } catch (error) {
+          response = `Error writing to txt file: ${error}`;
+        }
+        return response;
+      }
 }
 
 const helperService = new HelperService();
