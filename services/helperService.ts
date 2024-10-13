@@ -72,6 +72,10 @@ class HelperService {
 
       public prepareAIPrompt = (prompt: string, userProfile: string, jobAds: string): string => prompt.replace('__USERPROFILE_PLACEHOLDER__', userProfile).replace('__JOBADS_PLACEHOLDER__', jobAds);
 
+      /**
+      * @param {string} orgID organisationID
+      * @param {string} projId projectID
+      */
       public async getOpenAIResponse(prompt: string, orgID: string, projId: string): Promise<string> {
         try {
           const openai = new OpenAI({
