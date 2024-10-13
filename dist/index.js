@@ -16,10 +16,10 @@ dotenv_1.default.config();
  */
 async function scrapeJobs(config, chalk) {
     let browser; // intiate browser instance
-    let userResponse;
+    let userResponses = [];
     let numJobAds = 0;
     try {
-        browser = await puppeteer_1.default.launch({ headless: true });
+        browser = await puppeteer_1.default.launch({ headless: 'shell' });
         const page = await browser.newPage();
         // Öffnet die URL und wartet, bis die Seite vollständig geladen ist
         await page.goto(config.url, { waitUntil: "networkidle2" });
@@ -164,7 +164,7 @@ async function scrapeJobs(config, chalk) {
       - Datum seit: ${result.datumseit}
       - Beschreibung: ${result.beschreibung}
       `).join('\n');
-        userResponse = await helperService_1.default.logScrappingResults(logEntries);
+        userResponses.push(await helperService_1.default.logScrappingResults(logEntries));
         console.log(chalk.green("Waiting for AI response..."));
         let finalResults = '';
         try {
@@ -173,19 +173,21 @@ async function scrapeJobs(config, chalk) {
         catch (error) {
             console.log(chalk.red(error));
         }
-        helperService_1.default.logOpenAIResults(finalResults);
+        userResponses.push(await helperService_1.default.logOpenAIResults(finalResults));
     }
     catch (error) {
         console.log(chalk.red(`Error has occured: ${error.message}`));
     }
     finally {
         console.log(chalk.green('Job scrapping finished.'));
-        if (userResponse && userResponse.startsWith('Error')) {
-            console.log(chalk.red(userResponse));
-        }
-        else {
-            console.log(chalk.green(userResponse));
-        }
+        userResponses && userResponses.forEach((userResponse) => {
+            if (userResponse && userResponse.startsWith('Error')) {
+                console.log(chalk.red(userResponse));
+            }
+            else {
+                console.log(chalk.green(userResponse));
+            }
+        });
         if (browser)
             await browser.close();
         return numJobAds;

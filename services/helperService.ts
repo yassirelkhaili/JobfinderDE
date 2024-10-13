@@ -109,7 +109,7 @@ class HelperService {
           const fileName = `${timestamp}.txt`;
           const filePath = join(folderPath, fileName);
           await writeFile(filePath, aiResponse);
-          response = `Final Result written to ${filePath}`;
+          response = `Final results written to ${filePath}`;
         } catch (error) {
           response = `Error writing to txt file: ${error}`;
         }

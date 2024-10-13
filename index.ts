@@ -17,7 +17,7 @@ async function scrapeJobs(config: JobSuchKonfiguration, chalk: any): Promise<num
   let userResponses: string[] = [];
   let numJobAds = 0;
   try {
-    browser = await puppeteer.launch({ headless: true });
+    browser = await puppeteer.launch({ headless: 'shell' });
     const page = await browser.newPage();
 
     // Öffnet die URL und wartet, bis die Seite vollständig geladen ist
