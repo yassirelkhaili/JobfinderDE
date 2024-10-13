@@ -14,7 +14,7 @@ dotenv.config();
  */
 async function scrapeJobs(config: JobSuchKonfiguration, chalk: any): Promise<number> {
   let browser; // intiate browser instance
-  let userResponse;
+  let userResponses: string[] = [];
   let numJobAds = 0;
   try {
     browser = await puppeteer.launch({ headless: true });
@@ -191,24 +191,26 @@ async function scrapeJobs(config: JobSuchKonfiguration, chalk: any): Promise<num
       - Beschreibung: ${result.beschreibung}
       `
     ).join('\n');
-    userResponse = await helperService.logScrappingResults(logEntries);
+    userResponses.push(await helperService.logScrappingResults(logEntries));
     console.log(chalk.green("Waiting for AI response..."));
     let finalResults = '';
     try {
-      finalResults = await helperService.getOpenAIResponse(helperService.prepareAIPrompt(jobCategorizationPrompt, userProfile, logEntries), process.env.OPENAI_BASE_URL ?? '', process.env.OPENAI_API_KEY ?? '');
+      finalResults = await helperService.getOpenAIResponse(helperService.prepareAIPrompt(jobCategorizationPrompt, userProfile, logEntries), process.env.OPENAI_API_KEY ?? '');
     } catch (error) {
       console.log(chalk.red(error));
     }
-    helperService.logOpenAIResults(finalResults);
+      userResponses.push(await helperService.logOpenAIResults(finalResults));
   } catch (error: any) {
     console.log(chalk.red(`Error has occured: ${error.message}`));
   } finally {
     console.log(chalk.green('Job scrapping finished.'));
-    if (userResponse && userResponse.startsWith('Error')) {
-      console.log(chalk.red(userResponse));
-    } else {
-      console.log(chalk.green(userResponse));
-    }
+    userResponses && userResponses.forEach((userResponse) => {
+      if (userResponse && userResponse.startsWith('Error')) {
+        console.log(chalk.red(userResponse));
+      } else {
+        console.log(chalk.green(userResponse));
+      }
+    })
     if (browser) await browser.close();
     return numJobAds;
   }

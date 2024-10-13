@@ -76,11 +76,10 @@ class HelperService {
       * @param {string} baseURL openai base url
       * @param {string} apiKey open ai key
       */
-      public async getOpenAIResponse(prompt: string, baseURL: string, apiKey: string): Promise<string> {
+      public async getOpenAIResponse(prompt: string, apiKey: string): Promise<string> {
         try {
           const openai = new OpenAI({
             apiKey: apiKey,
-            baseURL: baseURL,
         });
       
           const response = await openai.chat.completions.create({
