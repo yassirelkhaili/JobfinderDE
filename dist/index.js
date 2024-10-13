@@ -172,7 +172,7 @@ async function scrapeJobs(config, chalk) {
         if (scrappingResults) {
             let finalResults = '';
             try {
-                finalResults = await helperService_1.default.getOpenAIResponse(helperService_1.default.prepareAIPrompt(prompt_1.jobCategorizationPrompt, prompt_1.userProfile, logEntries), process.env.OPENAI_API_KEY ?? '');
+                finalResults = await helperService_1.default.getOpenAIResponse(helperService_1.default.prepareAIPrompt(prompt_1.jobCategorizationPrompt, prompt_1.userProfile, logEntries), process.env.OPENAI_API_KEY ?? '', process.env.OPENAI_API_MODEL ?? '');
             }
             catch (error) {
                 console.log(chalk.red(error));

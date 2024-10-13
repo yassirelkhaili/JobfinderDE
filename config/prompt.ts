@@ -21,7 +21,7 @@ Based on the above details, categorize each job ad as one of the following:
 3. **Average**
 4. **Bad**
 
-Please provide the response in markdown format with the following structure:
+Please provide the response with the following structure:
 
 ### Great
 For job ads rated as "Great," list the details and a short explanation as follows:
@@ -30,7 +30,7 @@ For job ads rated as "Great," list the details and a short explanation as follow
 - **Ort**: [Location]
 - **Befristung**: [Contract Type]
 - **Datum seit**: [Posted Date]
-- **Link**: [Job Posting](<insert link here>)
+- **Link**: [Bezeichnung](<insert link here>)
 
 *Explanation*: Describe why this job ad is categorized as "Great," considering the job’s ease, technology match, contract type, and posting recency.
 
@@ -41,7 +41,7 @@ For job ads rated as "Good," list the details and a short explanation as follows
 - **Ort**: [Location]
 - **Befristung**: [Contract Type]
 - **Datum seit**: [Posted Date]
-- **Link**: [Job Posting](<insert link here>)
+- **Link**: [Bezeichnung](<insert link here>)
 
 *Explanation*: Describe why this job ad is categorized as "Good," considering the job’s ease, technology match, contract type, and posting recency.
 
@@ -52,7 +52,7 @@ For job ads rated as "Average," list the details and a short explanation as foll
 - **Ort**: [Location]
 - **Befristung**: [Contract Type]
 - **Datum seit**: [Posted Date]
-- **Link**: [Job Posting](<insert link here>)
+- **Link**: [Bezeichnung](<insert link here>)
 
 *Explanation*: Describe why this job ad is categorized as "Average," considering the job’s ease, technology match, contract type, and posting recency.
 
@@ -63,20 +63,20 @@ For job ads rated as "Bad," list the details and a short explanation as follows:
 - **Ort**: [Location]
 - **Befristung**: [Contract Type]
 - **Datum seit**: [Posted Date]
-- **Link**: [Job Posting](<insert link here>)
+- **Link**: [Bezeichnung](<insert link here>)
 
 *Explanation*: Describe why this job ad is categorized as "Bad," considering the job’s ease, technology match, contract type, and posting recency.
 
 ---
 
-Please ensure all content is formatted in markdown.
+Please ensure all content is formatted in markdown and dont add a summary stick to the format.
 `;
 
 export const userProfile: string = `
 - **Name**: Yassir Elkhaili
 - **Role**: Full Stack Developer
 - **Experience**: Skilled in both front-end and back-end development with a focus on TypeScript, PHP, Laravel, React, and web development frameworks. Open to a variety of roles, whether frontend, backend, or full-stack.
-- **Desired Job Type**: Open to all types of development jobs, with a focus on web development. Prefers roles that are straightforward with clearly defined tasks.
+- **Desired Job Type**: Open to all types of development jobs, with a focus on web development. Prefers roles that are straightforward with clearly defined tasks, mid level and junior developer jobs are preferable.
 - **Preferred Technologies**: Strong preference for TypeScript, PHP, Laravel, ReactJS, and TailwindCSS, but willing to explore other web development technologies.
 - **Contract Preference**: Open to various job types, with a slight preference for unbefristet (permanent) contracts.
 - **Location**: Based in Bremen, Germany, with a slight preference for local jobs in Bremen to minimize commute.

@@ -24,7 +24,7 @@ Based on the above details, categorize each job ad as one of the following:
 3. **Average**
 4. **Bad**
 
-Please provide the response in markdown format with the following structure:
+Please provide the response with the following structure:
 
 ### Great
 For job ads rated as "Great," list the details and a short explanation as follows:
@@ -33,7 +33,7 @@ For job ads rated as "Great," list the details and a short explanation as follow
 - **Ort**: [Location]
 - **Befristung**: [Contract Type]
 - **Datum seit**: [Posted Date]
-- **Link**: [Job Posting](<insert link here>)
+- **Link**: [Bezeichnung](<insert link here>)
 
 *Explanation*: Describe why this job ad is categorized as "Great," considering the job’s ease, technology match, contract type, and posting recency.
 
@@ -44,7 +44,7 @@ For job ads rated as "Good," list the details and a short explanation as follows
 - **Ort**: [Location]
 - **Befristung**: [Contract Type]
 - **Datum seit**: [Posted Date]
-- **Link**: [Job Posting](<insert link here>)
+- **Link**: [Bezeichnung](<insert link here>)
 
 *Explanation*: Describe why this job ad is categorized as "Good," considering the job’s ease, technology match, contract type, and posting recency.
 
@@ -55,7 +55,7 @@ For job ads rated as "Average," list the details and a short explanation as foll
 - **Ort**: [Location]
 - **Befristung**: [Contract Type]
 - **Datum seit**: [Posted Date]
-- **Link**: [Job Posting](<insert link here>)
+- **Link**: [Bezeichnung](<insert link here>)
 
 *Explanation*: Describe why this job ad is categorized as "Average," considering the job’s ease, technology match, contract type, and posting recency.
 
@@ -66,7 +66,7 @@ For job ads rated as "Bad," list the details and a short explanation as follows:
 - **Ort**: [Location]
 - **Befristung**: [Contract Type]
 - **Datum seit**: [Posted Date]
-- **Link**: [Job Posting](<insert link here>)
+- **Link**: [Bezeichnung](<insert link here>)
 
 *Explanation*: Describe why this job ad is categorized as "Bad," considering the job’s ease, technology match, contract type, and posting recency.
 
