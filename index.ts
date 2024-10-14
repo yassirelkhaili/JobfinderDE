@@ -16,21 +16,23 @@ async function scrapeJobs(config: JobSuchKonfiguration, chalk: any): Promise<num
   let browser; // intiate browser instance
   let userResponses: string[] = [];
   let numJobAds = 0;
+  let finalScrappingResults: Jobanzeige[] = [];
   try {
-    browser = await puppeteer.launch({ headless: "shell" });
+    browser = await puppeteer.launch({ headless: 'shell' });
     const page = await browser.newPage();
 
-    // Öffnet die URL und wartet, bis die Seite vollständig geladen ist
+    const arbeitsBezeichnungen = config["arbeitsBezeichnungen"];
+
+    for (const arbeitsbezeichnung of arbeitsBezeichnungen) {
+      console.log(chalk.green('Searching for Job ads for term: ' + arbeitsbezeichnung + '.'));
+         // Öffnet die URL und wartet, bis die Seite vollständig geladen ist
     await page.goto(config.url, { waitUntil: "networkidle2" });
 
     const cookies = await page.cookies();
     await page.deleteCookie(...cookies);
     await page.reload();
 
-    // Parse the values for arbeitsBezeichnungen and ort
-    const arbeitsBezeichnungen = helperService.parseArbeitsBezeichnungen(
-      config["arbeitsBezeichnungen"]
-    );
+    // Parse the values for  ort
     const ort = config["ort"];
 
     // Führt die Evaluierungsfunktion auf der Seite aus
@@ -58,12 +60,10 @@ async function scrapeJobs(config: JobSuchKonfiguration, chalk: any): Promise<num
      * und klickt anschließend auf den Submit-Button.
      */
     console.log(chalk.green("Filling up the search form."));
-    await page.type("#was-input", arbeitsBezeichnungen);
+    await page.type("#was-input", arbeitsbezeichnung);
     await page.type("#wo-input", ort);
     await page.click("#btn-stellen-finden");
-
-    await page.waitForSelector("#ergebnis-container", { timeout: 800 });
-
+    await page.waitForSelector("#ergebnis-container", { timeout: 1500 });
     await page.click("#filter-toggle");
 
     await new Promise((resolve: (value?: unknown) => void) =>
@@ -134,8 +134,10 @@ async function scrapeJobs(config: JobSuchKonfiguration, chalk: any): Promise<num
       if (offerNavigationElements) {
         for (const jobOfferNavigationLink of offerNavigationElements) {
           try {
-            await jobOfferNavigationLink.click();
+            await page.evaluate(el => el.scrollIntoView({ block: 'center', inline: 'center' }), jobOfferNavigationLink);
             await new Promise((resolve: (value?: unknown) => void) => setTimeout(resolve, 500));
+            await jobOfferNavigationLink.click();
+            await new Promise((resolve: (value?: unknown) => void) => setTimeout(resolve, 800));
             const offerDescriptionContainer = await page.waitForSelector(`#detail-beschreibung-beschreibung`, { timeout: 1000 });
             const descriptionText = offerDescriptionContainer && await offerDescriptionContainer.evaluate(el => (el as HTMLElement).innerText);
             const offerTitleContainer = await page.$('#detail-kopfbereich-titel');
@@ -182,8 +184,10 @@ async function scrapeJobs(config: JobSuchKonfiguration, chalk: any): Promise<num
     }
 
     const scrappingResults = await scrapeJobs();
+    finalScrappingResults = [...finalScrappingResults, ...scrappingResults];
+    }
     console.log(chalk.green("Logging scrapping resutls..."));
-    const logEntries = scrappingResults.map((result, index) => 
+    const logEntries = finalScrappingResults.map((result, index) => 
       `Job Ad ${index + 1}:
       - Bezeichnung: ${result.bezeichnung}
       - Firma: ${result.firma}
@@ -196,7 +200,7 @@ async function scrapeJobs(config: JobSuchKonfiguration, chalk: any): Promise<num
     ).join('\n');
     userResponses.push(await helperService.logScrappingResults(logEntries));
     console.log(chalk.green("Waiting for AI response..."));
-    if (scrappingResults) {
+    if (finalScrappingResults) {
     let finalResults = '';
     try {
       finalResults = await helperService.getOpenAIResponse(helperService.prepareAIPrompt(jobCategorizationPrompt, userProfile, logEntries), process.env.OPENAI_API_KEY ?? '', process.env.OPENAI_API_MODEL ?? '');
@@ -205,7 +209,7 @@ async function scrapeJobs(config: JobSuchKonfiguration, chalk: any): Promise<num
     }
       if (finalResults !== '') userResponses.push(await helperService.logOpenAIResults(finalResults));
     } else {
-      console.log(chalk.red("Scrapping was unsuccessful result: " + scrappingResults));
+      console.log(chalk.red("Scrapping was unsuccessful result: " + finalScrappingResults));
     }
   } catch (error: any) {
     console.log(chalk.red(`Error has occured: ${error.message}`));

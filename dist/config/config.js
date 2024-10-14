@@ -15,7 +15,7 @@ exports.jobSuchKonfiguration = {
      */
     arbeitsBezeichnungen: [
         'Fachinformatiker/in Anwendungsentwicklung',
-        // 'Webentwickler', 
+        'Webentwickler',
         // 'Webentwickler Backend', 
         // 'Full-Stack Web-Entwickler/in'
     ],
@@ -42,7 +42,7 @@ exports.jobSuchKonfiguration = {
      * veröffentlichkeit: Zeitrahmen, in dem die Stellenanzeigen veröffentlicht wurden.
      * Mögliche Werte: 'Heute', 'Gestern', '1 Woche', '2 Wochen', '4 Wochen', 'Alle anzeigen'
      */
-    veroeffentlichtseit: ['2 Wochen'],
+    veroeffentlichtseit: ['Gestern'],
     /**
      * optional
      * berufsfeld: Übergeordnete Berufsfelder, in denen gesucht wird.

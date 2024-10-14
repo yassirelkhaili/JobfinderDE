@@ -72,13 +72,13 @@ For job ads rated as "Bad," list the details and a short explanation as follows:
 
 ---
 
-Please ensure all content is formatted in markdown.
+Please ensure all content is formatted in markdown and dont add a summary stick to the format.
 `;
 exports.userProfile = `
 - **Name**: Yassir Elkhaili
 - **Role**: Full Stack Developer
 - **Experience**: Skilled in both front-end and back-end development with a focus on TypeScript, PHP, Laravel, React, and web development frameworks. Open to a variety of roles, whether frontend, backend, or full-stack.
-- **Desired Job Type**: Open to all types of development jobs, with a focus on web development. Prefers roles that are straightforward with clearly defined tasks.
+- **Desired Job Type**: Open to all types of development jobs, with a focus on web development. Prefers roles that are straightforward with clearly defined tasks, mid level and junior developer jobs are preferable.
 - **Preferred Technologies**: Strong preference for TypeScript, PHP, Laravel, ReactJS, and TailwindCSS, but willing to explore other web development technologies.
 - **Contract Preference**: Open to various job types, with a slight preference for unbefristet (permanent) contracts.
 - **Location**: Based in Bremen, Germany, with a slight preference for local jobs in Bremen to minimize commute.
